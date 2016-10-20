@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
+ * Main file for SIMPLE compiler
  * File:   main.cpp
- * Author: hdamron1594
- *
+ * Author: Hunter Damron and Dennis Perea
+ *          (hdamron17)      (sacredden)
  * Created on October 20, 2016, 10:37 AM
  */
 
@@ -16,10 +11,10 @@
 using namespace std;
 
 /*
- * 
+ * Main function for using SIMPLE compiler
  */
 int main(int argc, char** argv) {
-
+    
     return 0;
 }
 
