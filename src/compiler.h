@@ -23,8 +23,9 @@ private:
     std::vector<std::vector<std::string>> \
                                make_sml(std::vector<std::vector<std::string>>*);
     static std::vector<std::string> tokenize(std::string, std::string);
+    static std::vector<std::string> to_postfix(std::vector<std::string>);
     
-    std::vector<int> addresses;
+    std::map<int,int> addresses; //Map of SIMPLE code addresses to SML addresses
     std::vector<char> vars;
 };
 

@@ -9,8 +9,10 @@
 
 #include <fstream>
 #include <vector>
-#include <functional>
 #include "compiler.h"
+
+//TODO remove unnecessary imports
+#include <functional>
 
 using namespace std;
 
@@ -18,7 +20,7 @@ using namespace std;
  * Compiler with input stream and output stream
  * @param input Input stream with SIMPLE code
  * @param output Output stream to which to write SML code
- * @author Hunter Damron
+ * @author //TODO
  */
 compiler::compiler(istream *input, ostream *output) {
     //TODO constructor and function call organization
@@ -34,7 +36,7 @@ compiler::~compiler() {
  * Parses data from istream into 2D vector for processing
  * @param input Input istream with SIMPLE code
  * @return Returns 2D array with each statement on a row and each word a term
- * @author Hunter Damron
+ * @author //TODO
  */
 vector<vector<string>> compiler::parse(istream *input) {
     //TODO parse method form two dimensional array with each new line in a row
@@ -49,6 +51,18 @@ vector<vector<string>> compiler::parse(istream *input) {
  */
 vector<vector<string>> compiler::make_sml(vector<vector<string>> *simple_code) {
     //TODO process SIMPLE code vector and generate code for each term
+}
+
+/**
+ * Converts infix to postfix for easier processing
+ * @param infix Tokenized string of math in infix notation
+ * @return Returns the same math in postfix notation
+ * @author Hunter Damron
+ */
+vector<string> to_postfix(vector<string> infix) {
+    //TODO convert infix notation to postfix
+    string ops = "+-*/()";
+     
 }
 
 /**
