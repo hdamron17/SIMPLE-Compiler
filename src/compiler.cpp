@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <vector>
+#include <functional>
 #include "compiler.h"
 
 using namespace std;
@@ -20,7 +21,7 @@ using namespace std;
  * @author Hunter Damron
  */
 compiler::compiler(istream *input, ostream *output) {
-    
+    //TODO constructor and function call organization
 }
 
 /**
@@ -46,7 +47,7 @@ vector<vector<string>> compiler::parse(istream *input) {
  * @return Returns 2D vector containing SML code in same format as simple_code
  * @author //TODO
  */
-vector<vector<string>> compiler::make_sml(vector<vector<string>> simple_code) {
+vector<vector<string>> compiler::make_sml(vector<vector<string>> *simple_code) {
     //TODO process SIMPLE code vector and generate code for each term
 }
 

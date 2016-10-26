@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <vector>
+#include <map>
 
 class compiler {
 public:
@@ -20,9 +21,11 @@ public:
 private:
     std::vector<std::vector<std::string>> parse(std::istream*);
     std::vector<std::vector<std::string>> \
-                    make_sml(std::vector<std::vector<std::string>> simple_code);
-    std::vector<std::string> tokenize(std::string, std::string);
-
+                               make_sml(std::vector<std::vector<std::string>>*);
+    static std::vector<std::string> tokenize(std::string, std::string);
+    
+    std::vector<int> addresses;
+    std::vector<char> vars;
 };
 
 #endif /* COMPILER_H */
