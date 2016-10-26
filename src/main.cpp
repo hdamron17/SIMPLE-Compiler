@@ -1,6 +1,6 @@
 /* 
  * Main file for SIMPLE compiler
- * File:   main.cpp
+ * File:   src/main.cpp
  * Author: Hunter Damron and Dennis Perea
  *          (hdamron17)      (sacredden)
  * 

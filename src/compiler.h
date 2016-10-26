@@ -1,6 +1,6 @@
 /* 
  * //TODO compiler.h overview
- * File:   compiler.h
+ * File:   src/compiler.h
  * Author: Hunter Damron and Dennis Perea
  *          (hdamron17)      (sacredden)
  *

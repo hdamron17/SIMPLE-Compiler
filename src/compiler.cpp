@@ -1,6 +1,6 @@
 /* 
  * //TODO compiler.cpp overview
- * File:   compiler.cpp
+ * File:   src/compiler.cpp
  * Author: Hunter Damron and Dennis Perea
  *          (hdamron17)      (sacredden)
  * 
