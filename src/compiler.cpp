@@ -12,9 +12,12 @@
 #include "compiler.h"
 
 //TODO remove unnecessary imports
-#include <functional>
+#include <iostream>
 
 using namespace std;
+
+static const string ALPHA = "abcdefghijklmnopqrstuvwxyz";
+static const string NUMERIC = "1234567890";
 
 /**
  * Compiler with input stream and output stream
@@ -54,15 +57,29 @@ vector<vector<string>> compiler::make_sml(vector<vector<string>> *simple_code) {
 }
 
 /**
+ * Writes SML for let command, adding variables to instance list
+ * @param cmd Tokenized SIMPLE command (must start with let)
+ * @return Returns tuple containing (full SML string, number of SML lines)
+ * @author Hunter Damron
+ */
+tuple<string,int> compiler::let(vector<string> *cmd) {
+    if(cmd->size() >= 4 && cmd->at(0) == "let" && cmd->at(2) == "=") {
+        vector<string> infix(cmd->begin()+3, cmd->end());
+        vector<string> postfix = to_postfix(&infix);
+        
+    } else {
+        //TODO throw exception for invalid command format
+    }
+}
+
+/**
  * Converts infix to postfix for easier processing
  * @param infix Tokenized string of math in infix notation
  * @return Returns the same math in postfix notation
- * @author Hunter Damron
+ * @author //TODO
  */
-vector<string> to_postfix(vector<string> infix) {
+vector<string> compiler::to_postfix(vector<string> *infix) {
     //TODO convert infix notation to postfix
-    string ops = "+-*/()";
-     
 }
 
 /**

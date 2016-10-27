@@ -6,10 +6,10 @@
  * 
  * Created on October 20, 2016, 10:37 AM
  */
+#include <iostream>
+#include <vector>
 
-#include <cstdlib>
-
-using namespace std;
+#include "compiler.h"
 
 void unittest() {
     //TODO unit test for testing code in intermediate stages
@@ -20,6 +20,13 @@ void unittest() {
  */
 int main(int argc, char** argv) {
     unittest();
+    
+    //TODO remove test code
+    std::string teststr = "let b = 5 * 9 + ( 7 - 9 )";
+    std::vector<std::string> testvec = compiler::tokenize(teststr, " ");
+    compiler testcplr(&std::cin, &std::cout);
+    testcplr.let(&testvec);
+    
     return 0;
 }
 
