@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <vector>
+#include <sstream>
 #include "compiler.h"
 
 //TODO remove unnecessary imports
@@ -54,22 +55,87 @@ vector<vector<string>> compiler::parse(istream *input) {
  */
 vector<vector<string>> compiler::make_sml(vector<vector<string>> *simple_code) {
     //TODO process SIMPLE code vector and generate code for each term
+    //TODO Note: make sure to add linenum of each command to addresses map
+}
+
+/**
+ * Writes SML for input command, putting filler for variable address
+ * @param cmd Tokenized SIMPLE input command (<linenum> input <var>)
+ * @return Returs full SML string (always a single line for input command)
+ * @author Hunter Damron
+ */
+string compiler::input(vector<string> *cmd) {
+    if(cmd->size() == 3) {
+        string var = cmd->at(2);
+        if(ALPHA.find(var) != string::npos) {
+            vars.insert(var);
+        } else {
+            //TODO throw error for invalid variable
+        }
+        stringstream sml;
+        sml << "10" << var << endl;
+        return sml.str();
+    } else {
+        //TODO throw exception for invalid command format
+    }
+}
+
+/**
+ * Writes SML for outpt command, putting filler for variable address
+ * @param cmd Tokenized SIMPLE output command (<linenum> output <var>)
+ * @return Returs full SML string (always a single line for output command)
+ * @author Hunter Damron
+ */
+string compiler::output(vector<string> *cmd) {
+    if(cmd->size() == 3) {
+        string var = cmd->at(2);
+        if(ALPHA.find(var) != string::npos) {
+            vars.insert(var);
+        } else {
+            //TODO throw error for invalid variable
+        }
+        stringstream sml;
+        sml << "11" << var << endl;
+        return sml.str();
+    } else {
+        //TODO throw exception for invalid command format
+    }
 }
 
 /**
  * Writes SML for let command, adding variables to instance list
- * @param cmd Tokenized SIMPLE command (must start with let)
+ * @param cmd Tokenized SIMPLE let command (<linenum> let <var> = <term>)
  * @return Returns tuple containing (full SML string, number of SML lines)
- * @author Hunter Damron
+ * @author //TODO
  */
 tuple<string,int> compiler::let(vector<string> *cmd) {
-    if(cmd->size() >= 4 && cmd->at(0) == "let" && cmd->at(2) == "=") {
+    if(cmd->size() >= 5 && cmd->at(3) == "=") {
         vector<string> infix(cmd->begin()+3, cmd->end());
         vector<string> postfix = to_postfix(&infix);
         
+        string var = cmd->at(2);
+        if(ALPHA.find(var) != string::npos) {
+            vars.insert(var);
+        } else {
+            //TODO throw error for invalid variable
+        }
+        stringstream sml;
+        //TODO put stuff into accumulator
     } else {
         //TODO throw exception for invalid command format
     }
+}
+
+/**
+ * Replaces temporary variable names with physical addresses for final SML code
+ *      -Also checks that SML code fits within 100 op limit
+ * @param partial_sml SML code containing variable names
+ * @return Returns complete SML code with all variable names replaced
+ * @author //TODO
+ */
+string compiler::second_parse(std::string partial_sml) {
+    //TODO replace all variables and addresses with actual values, also check
+    //      for memory overflow
 }
 
 /**

@@ -22,10 +22,10 @@ int main(int argc, char** argv) {
     unittest();
     
     //TODO remove test code
-    std::string teststr = "let b = 5 * 9 + ( 7 - 9 )";
+    std::string teststr = "14 input y";
     std::vector<std::string> testvec = compiler::tokenize(teststr, " ");
     compiler testcplr(&std::cin, &std::cout);
-    testcplr.let(&testvec);
+    std::cout << testcplr.input(&testvec);
     
     return 0;
 }
