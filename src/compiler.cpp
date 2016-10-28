@@ -24,7 +24,6 @@ static const string NUMERIC = "1234567890";
  * Compiler with input stream and output stream
  * @param input Input stream with SIMPLE code
  * @param output Output stream to which to write SML code
- * @author //TODO
  */
 compiler::compiler(istream *input, ostream *output) {
     //TODO constructor and function call organization
@@ -40,7 +39,6 @@ compiler::~compiler() {
  * Parses data from istream into 2D vector for processing
  * @param input Input istream with SIMPLE code
  * @return Returns 2D array with each statement on a row and each word a term
- * @author //TODO
  */
 vector<vector<string>> compiler::parse(istream *input) {
     //TODO parse method form two dimensional array with each new line in a row
@@ -51,18 +49,40 @@ vector<vector<string>> compiler::parse(istream *input) {
  * Generates 2D SML code vector from 2D SIMPLE code vector
  * @param simple_code 2D vector containing SIMPLE code (produced by parse() )
  * @return Returns 2D vector containing SML code in same format as simple_code
- * @author //TODO
  */
 vector<vector<string>> compiler::make_sml(vector<vector<string>> *simple_code) {
     //TODO process SIMPLE code vector and generate code for each term
     //TODO Note: make sure to add linenum of each command to addresses map
+    for(vector<string> line : (*simple_code) ) {
+        //TODO parse each command individually
+        if(line.size() >= 3) {
+            try {
+                int linenum = stoi(line[0]);
+                //TODO check that linenum is within 0 to 100
+                address_map.insert({linenum, program_size});
+            } catch(invalid_argument& e) {
+                //TODO handle error of invalid linenum
+            } //TODO possibly also handle out_of_range for int max/min value
+            string command = line[1];
+            if(command == "rem") {
+                
+            } else if(command == "input") {
+                
+            } else if(command == "output") {
+                
+            } else if(command == "goto") {
+                
+            }
+        } else {
+            //TODO throw error about not enough arguments
+        }
+    }
 }
 
 /**
  * Writes SML for input command, putting filler for variable address
  * @param cmd Tokenized SIMPLE input command (<linenum> input <var>)
  * @return Returs full SML string (always a single line for input command)
- * @author Hunter Damron
  */
 string compiler::input(vector<string> *cmd) {
     if(cmd->size() == 3) {
@@ -84,7 +104,6 @@ string compiler::input(vector<string> *cmd) {
  * Writes SML for outpt command, putting filler for variable address
  * @param cmd Tokenized SIMPLE output command (<linenum> output <var>)
  * @return Returs full SML string (always a single line for output command)
- * @author Hunter Damron
  */
 string compiler::output(vector<string> *cmd) {
     if(cmd->size() == 3) {
@@ -106,7 +125,6 @@ string compiler::output(vector<string> *cmd) {
  * Writes SML for let command, adding variables to instance list
  * @param cmd Tokenized SIMPLE let command (<linenum> let <var> = <term>)
  * @return Returns tuple containing (full SML string, number of SML lines)
- * @author //TODO
  */
 tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
@@ -131,7 +149,6 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
  *      -Also checks that SML code fits within 100 op limit
  * @param partial_sml SML code containing variable names
  * @return Returns complete SML code with all variable names replaced
- * @author //TODO
  */
 string compiler::second_parse(std::string partial_sml) {
     //TODO replace all variables and addresses with actual values, also check
@@ -142,7 +159,6 @@ string compiler::second_parse(std::string partial_sml) {
  * Converts infix to postfix for easier processing
  * @param infix Tokenized string of math in infix notation
  * @return Returns the same math in postfix notation
- * @author //TODO
  */
 vector<string> compiler::to_postfix(vector<string> *infix) {
     //TODO convert infix notation to postfix

@@ -36,13 +36,15 @@ public:
     static std::vector<std::string> to_postfix(std::vector<std::string>*);
     
     std::unordered_set<int> addresses; //Map of SIMPLE code addresses to SML addresses
-    //Note: addresses are written in the form a42 for address 42
+    //Note: needed addresses are written in the form a42 for address 42
     std::unordered_set<std::string> vars;
     //Note: all vars are single letters in SIMPLE code, but others are allowed
     std::unordered_set<int> constants;
     //Note: constants are written in the form c42 for number 42
-    int stack_size = 0;
-    int program_size = 0;
+    std::unordered_map<int,int> address_map;
+    //Note: address map has actual addresses mapped SIMPLE to SML
+    int stack_size = 0; //Number of stack memory locations necessary
+    int program_size = 0; //SML physical position of last command + 1
 };
 
 #endif /* COMPILER_H */
