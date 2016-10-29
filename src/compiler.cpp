@@ -72,7 +72,7 @@ vector<vector<string>> compiler::make_sml(vector<vector<string>> *simple_code) {
                 
             } else if(command == "goto") {
                 
-            }
+            } 
         } else {
             //TODO throw error about not enough arguments
         }
