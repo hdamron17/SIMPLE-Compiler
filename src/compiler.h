@@ -1,8 +1,8 @@
 /* 
  * //TODO compiler.h overview
  * File:   src/compiler.h
- * Author: Hunter Damron and Dennis Perea
- *          (hdamron17)      (sacredden)
+ * Author: Hunter Damron and Brennan Cain
+ *          (hdamron17)       (brenn10)
  *
  * Created on October 24, 2016, 10:08 AM
  */
@@ -20,20 +20,22 @@ class compiler {
 public:
     compiler(std::istream*, std::ostream*); //SIMPLE code input, SML output
     virtual ~compiler();
+    
+    static std::vector<std::string> tokenize(std::string, std::string);
 //private: //TODO reapply private label
     std::vector<std::vector<std::string>> parse(std::istream*);
-    std::vector<std::vector<std::string>> \
-                               make_sml(std::vector<std::vector<std::string>>*);
+    std::string make_sml(std::vector<std::vector<std::string>>*);
     
-    std::string rem(std::vector<std::string>*);
+  //TODO figure out what we need to do for each command (function may only be necessary for let command)
     std::string input(std::vector<std::string>*);
     std::string output(std::vector<std::string>*);
     std::tuple<std::string,int> let(std::vector<std::string>*);
+    std::string _goto(std::vector<std::string>*);
     
     std::string second_parse(std::string);
     
-    static std::vector<std::string> tokenize(std::string, std::string);
     static std::vector<std::string> to_postfix(std::vector<std::string>*);
+    static bool higherRank(std::string op1, std::string op2);//gives true if op1 is of higher precedence
     
     std::unordered_set<int> addresses; //Map of SIMPLE code addresses to SML addresses
     //Note: needed addresses are written in the form a42 for address 42
@@ -48,4 +50,3 @@ public:
 };
 
 #endif /* COMPILER_H */
-
