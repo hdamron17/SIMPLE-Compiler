@@ -3,12 +3,13 @@
  * File:   src/compiler.cpp
  * Author: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
- * 
+ * http://csis.pace.edu/~wolf/CS122/infix-postfix.htm
  * Created on October 24, 2016, 10:08 AM
  */
 
 #include <fstream>
 #include <vector>
+#include <stack>
 #include <sstream>
 #include "compiler.h"
 
@@ -22,12 +23,48 @@ static const string ALPHA = "abcdefghijklmnopqrstuvwxyz";
 static const string NUMERIC = "1234567890";
 //TODO figure out constants to prevent redundency
 
+void compiler::compile(string infile, string outfile) {
+    ifstream* in = new ifstream(infile, ios::in);
+    ofstream* out = new ofstream(outfile,ios::out);
+    compile(in, out);
+    out->close();
+    delete in;
+    delete out;
+}
+
+//TODO note that ostream and istream will not be closed within this. 
+//TODO possibly replace with strings for filenames
+void compiler::compile(istream *in, ostream *out) {
+//  	die();
+  	compiler cpl(in);
+  	string sml = cpl.get_sml(in);
+        (*out) << sml;
+}
+
+string compiler::get_sml(istream *in)
+{
+    //TODO funtion must read from input stream and tokenize before making SML
+    vector<vector<string>> input = parse(in);
+//    cout << "=== tokenized\n"; //TODO remove
+//    for(auto outer : input) { //TODO remove whole loop
+//        for(auto inner : outer) {
+//            cout << inner << " | ";
+//        }
+//        cout << endl; 
+//    }
+    string pseudoSML = make_sml(&input);
+//    cout << "=== pseudo\n" << pseudoSML << endl; //TODO remove
+    string realSML = second_parse(pseudoSML);
+//    cout << "=== real\n" << realSML << endl; //TODO remove
+    return realSML;
+}
+
 /**
  * Compiler with input stream and output stream
  * @param input Input stream with SIMPLE code
  * @param output Output stream to which to write SML code
  */
-compiler::compiler(istream *input, ostream *output) {
+compiler::compiler(istream *input) {
     //TODO constructor and function call organization
 }
 
@@ -43,8 +80,14 @@ compiler::~compiler() {
  * @return Returns 2D array with each statement on a row and each word a term
  */
 vector<vector<string>> compiler::parse(istream *input) {
-    //TODO parse method form two dimensional array with each new line in a row
-    //  and each word in a line as an element in the row (using tokenize() )
+    vector<vector<string>> parsed;
+    while(!input->eof()){
+        string in;
+        getline((*input),in);
+        vector<string> line = tokenize(in," ");
+        parsed.push_back(line);
+    }
+    return parsed;
 }
 
 /**
@@ -62,7 +105,7 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
             try {
                 int linenum = stoi(line[0]);
                 //TODO check that linenum is within 0 to 100
-                cout << "[" << linenum << "] -> [" << program_size << "]" << endl; //TODO remove
+                //cout << "[" << linenum << "] -> [" << program_size << "]" << endl; //TODO remove
                 address_map.insert({linenum, program_size});
             } catch(invalid_argument& e) {
                 //TODO handle error of invalid linenum
@@ -117,7 +160,8 @@ string compiler::input(vector<string> *cmd) {
         sml << "10" << var << endl;
         return sml.str();
     } else {
-        //TODO throw exception for invalid command format
+        //TODO correct exception for bad parameter (invalid command)
+      	throw invalid_argument("IT BROKE");
     }
 }
 
@@ -190,7 +234,7 @@ string compiler::_goto(vector<string> *cmd) {
 tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
         vector<string> infix(cmd->begin()+3, cmd->end());
-//        vector<string> postfix = to_postfix(&infix);
+        vector<string> postfix = to_postfix(infix);
         
         string var = cmd->at(2);
         if(ALPHA.find(var) != string::npos) {
@@ -199,8 +243,8 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
             //TODO throw error for invalid variable
         }
         stringstream sml;
-     	for(auto token : /*postfix*/ infix) {
-        	
+     	for(auto token : postfix) {
+            
         }
         //TODO put stuff into accumulator
     } else {
@@ -214,28 +258,196 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
  * @param partial_sml SML code containing variable names
  * @return Returns complete SML code with all variable names replaced
  */
-string compiler::second_parse(std::string partial_sml) {
-    //TODO replace all variables and addresses with actual values, also check
-    //      for memory overflow
-}
-
 /**
- * Gives true if op1 is of higher precedence
-*/
-bool compiler::higherRank(string op1, string op2) 
-{
-  
-}
-
-/**
- * Converts infix to postfix for easier processing
- * @param infix Tokenized string of math in infix notation
- * @return Returns the same math in postfix notation
+ * Pseudocode algorithm
+ * -check that 'program_size' + 'stack_size' + size('vars') + size('constants') <= 100
+ * -for each value in 'addresses':
+ * 		-look up sml equivalent in 'address_map'
+ * 		-search and replace "a(simple address)" to "(sml address)"
+ * 			-i.e. SIMPLE 40 maps to SML 8 so replace "a40" with "08"
+ * -for each value in 'constants':
+ * 		-search and replace "c(constant)" to "(program_size)"
+ * 		-append the constant value with four digits using leading zeros to new line in the SML output
+ * 		-incrememnt the 'program_size'
+ * -for loop incrementing from 0 to 'stack_size' (index value is called 'i' here):
+ * 		-search and replace "s(i)" to "(program_size)"
+ * 		-append "0000" to new line in SML output
+ * 		-incrememnt the 'program_size'
+ * -for each value in 'vars':
+ * 		-search and replace "(var)" to "(program_size)"
+ * 		-incrememnt 'program_size'
+ * -return modified string with true SML output
  */
-vector<string> compiler::to_postfix(vector<string> *infix) 
+string compiler::second_parse(string partial_sml) {
+    if(program_size + stack_size + vars.size() + constants.size() > 100) {
+        //TODO throw errors here
+    }
+    //Replace addresses
+    for(auto iter = addresses.begin(); iter != addresses.end(); iter++) {
+      	try {
+            int replace = address_map.at(*iter);
+            string newstr = fmt(to_string(replace), 2, '0');
+//            cout << "a" + to_string(*iter) << " -> " << newstr << endl; //TODO remove
+            partial_sml = replace_all(partial_sml, "a" + to_string(*iter), newstr);
+        } catch (out_of_range& e) {
+          	//TODO catch the error of unknown address reference
+        }
+    }
+    //Replace stack variables
+    for(int i = 0; i < stack_size; i++) {
+//        cout << "a" + to_string(i) << " -> " << fmt(to_string(program_size), 2, '0') << endl; //TODO remove
+        string newstr = fmt(to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, "s" + to_string(i), newstr) + "0000\n";
+        program_size++;
+    }
+    
+    //Replace constants
+    for(auto iter = constants.begin(); iter != constants.end(); iter++) {
+        string newstr = fmt(to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, "c" + to_string(*iter), newstr)
+                + fmt(to_string(*iter), 4, '0') + "\n";
+        program_size++;
+    }
+    
+    //Replace variables
+    for(auto iter = vars.begin(); iter != vars.end(); iter++) {
+        string newstr = fmt(to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, *iter, newstr) + "0000\n";
+        program_size++;
+    }
+    return partial_sml;
+}
+
+string compiler::replace_all(string str, string oldstr, string newstr) {
+    int oldsize = oldstr.size();
+    int strsize = str.size();
+    stringstream ret;
+    int prev = 0;
+    for(int i = 0; i + oldsize <= strsize; i++) {
+        if(oldstr == str.substr(i, oldsize)) {
+            ret << str.substr(prev, i-prev) << newstr;
+            i += oldsize;
+            prev = i;
+        }
+    }
+    ret << str.substr(prev, strsize-1);
+    return ret.str();
+}
+
+string compiler::fmt(string original, int size, char fill) {
+    int origsize = original.size();
+    if(origsize < size) {
+        for(int i = 0; i < size - origsize; i++) {
+            original = fill + original;
+        }
+    }
+    return original;
+}
+      
+/**
+ * Gives which op is of higher precedence
+ * @param op1 first operation
+ * @param op2 second operation
+ * @return int 1: first is higher, 0: both are equal, -1: second is higher
+ * @author Brennan Cain
+*/
+int compiler::precedence(string op1, string op2)
 {
-	//Queue<string> post();
-  	
+	string t1="^";
+	string t2="*/";
+	string t3="+-";
+	if( (t1.find(op1)!=string::npos and t1.find(op2)!=string::npos) or \
+		(t2.find(op1)!=string::npos and t2.find(op2)!=string::npos) or \
+		(t3.find(op1)!=string::npos and t3.find(op2)!=string::npos))
+	{
+		return 0;
+	}
+	else if(t1.find(op1)!=string::npos)
+	{
+		return 1;
+	}
+	else if(t1.find(op2)!=string::npos)
+	{
+		return -1;
+	}
+	else if(t2.find(op1)!=string::npos)
+	{
+		return 1;
+	}
+	else if(t2.find(op2)!=string::npos)
+	{
+		return -1;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+/**
+ * Converts a vector of infix to a queue of postfix
+ * @param infix vector<string> golds the infix string broken on spaces
+ * @return queue<string> postfixed statement
+ * @author Brennan Cain
+*/
+vector<string> compiler::to_postfix(vector<string> infix) 
+{
+	string operators="-*/+()";
+	vector<string> post;
+	stack<string> ops;
+	for(auto i : infix)
+	{
+		if(operators.find(i)==string::npos)//If a constant
+		{
+			post.push_back(i);
+		}
+		else if(ops.empty())//If the op stack is empty, add the op
+		{
+			ops.push(i);
+		}
+		else if(ops.top()=="(" or i=="(")//If the new op or top op are left paren, add new op
+		{
+			ops.push(i);
+		}
+		else if(i==")")//If a right paren, pop ops until left paren
+		{
+			while(ops.top()!="(")
+			{
+				post.push_back(ops.top());
+				ops.pop();
+			}
+			ops.pop();
+		}
+		else if(precedence(i,ops.top())==1)//if new op has higher precedence, push it
+		{
+			ops.push(i);
+		}
+		else if(precedence(i,ops.top())==0)//if the new op has equal precedence, pop and push new
+		{
+			post.push_back(ops.top());
+			ops.pop();
+			ops.push(i);
+		}
+		else if(precedence(i,ops.top())==-1) //If new is lower, solve until new is equal or higher
+		{
+			while(precedence(i,ops.top())==-1)
+			{
+				post.push_back(ops.top());
+				ops.pop();
+				if(ops.empty())//Prevents segmentation faults
+				{
+					break;
+				}
+			}
+			ops.push(i);
+		}
+	}
+	while(!ops.empty())//Flush the rest of the ops
+	{
+		post.push_back(ops.top());
+		ops.pop();
+	}
+	return post;
 }
 
 /**
@@ -260,3 +472,4 @@ vector<string> compiler::tokenize(string str, string delimiter) {
     }
     return tokens;
 }
+
