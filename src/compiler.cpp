@@ -3,7 +3,7 @@
  * File:   src/compiler.cpp
  * Author: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
- * http://csis.pace.edu/~wolf/CS122/infix-postfix.htm
+ * Algorithm from: http://csis.pace.edu/~wolf/CS122/infix-postfix.htm
  * Created on October 24, 2016, 10:08 AM
  */
 
@@ -11,6 +11,7 @@
 #include <vector>
 #include <stack>
 #include <sstream>
+#include <exception>
 #include "compiler.h"
 
 //TODO remove unnecessary imports
@@ -18,10 +19,7 @@
 
 using namespace std;
 
-static const string CONSTANTS = "abcdefghijklmnopqrstuvwxyz1234567890";
 static const string ALPHA = "abcdefghijklmnopqrstuvwxyz";
-static const string NUMERIC = "1234567890";
-//TODO figure out constants to prevent redundency
 
 void compiler::compile(string infile, string outfile) {
     ifstream* in = new ifstream(infile, ios::in);
@@ -32,47 +30,30 @@ void compiler::compile(string infile, string outfile) {
     delete out;
 }
 
-//TODO note that ostream and istream will not be closed within this. 
-//TODO possibly replace with strings for filenames
+// note that ostream and istream will not be closed within this. 
 void compiler::compile(istream *in, ostream *out) {
-//  	die();
-  	compiler cpl(in);
+  	compiler cpl;
   	string sml = cpl.get_sml(in);
-        (*out) << sml;
+    (*out) << sml;
 }
 
 string compiler::get_sml(istream *in)
 {
-    //TODO funtion must read from input stream and tokenize before making SML
     vector<vector<string>> input = parse(in);
-//    cout << "=== tokenized\n"; //TODO remove
-//    for(auto outer : input) { //TODO remove whole loop
-//        for(auto inner : outer) {
-//            cout << inner << " | ";
-//        }
-//        cout << endl; 
-//    }
     string pseudoSML = make_sml(&input);
-//    cout << "=== pseudo\n" << pseudoSML << endl; //TODO remove
     string realSML = second_parse(pseudoSML);
-//    cout << "=== real\n" << realSML << endl; //TODO remove
     return realSML;
 }
 
 /**
- * Compiler with input stream and output stream
- * @param input Input stream with SIMPLE code
- * @param output Output stream to which to write SML code
+ * Prevents external instantiation
  */
-compiler::compiler(istream *input) {
-    //TODO constructor and function call organization
-}
+compiler::compiler() {}
 
 /**
  * Default deconstructor
  */
-compiler::~compiler() {
-}
+compiler::~compiler() {}
 
 /**
  * Parses data from istream into 2D vector for processing
@@ -104,15 +85,27 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
         if(line.size() >= 2) {
             try {
                 int linenum = stoi(line[0]);
-                //TODO check that linenum is within 0 to 100
-                //cout << "[" << linenum << "] -> [" << program_size << "]" << endl; //TODO remove
+              	if(linenum>99 or linenum<0) {
+                	cerr<<"Program too large on line " << linenum<<endl;
+                  	exit(EXIT_FAILURE);
+                }
                 address_map.insert({linenum, program_size});
             } catch(invalid_argument& e) {
-                //TODO handle error of invalid linenum
-            } //TODO possibly also handle out_of_range for int max/min value
+                cerr<<"Invalid line number " <<line[0]<<endl;
+                exit(EXIT_FAILURE);
+            } catch(exception e)
+            {
+              	cerr<<"Line number too large at "<< line[0] << endl;
+                exit(EXIT_FAILURE);
+            }
             string command = line[1];
             if(command == "rem") {
-                //TODO put an easter egg here maybe
+                sml_stream << "; ";
+                for(int i =2; i<line.size(); i++)
+                {
+              		sml_stream << line[i] << " ";
+                }
+              	sml_stream << endl;
             } else if(command == "input") {
                 sml_stream << input(&line);
                 program_size++;
@@ -129,14 +122,28 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
                 sml_stream << get<0>(cmd);
                 program_size += get<1>(cmd);
             } else if(command == "end") {
-              	//TODO possibly test if there are unnecessary terms after end
                 sml_stream << "4300\n";
                 program_size++;
             } else {
-              	//TODO throw error for invalid command
+              	cerr << "Command \"" << line[1] << "\" invalid."<<endl;
+              	exit(EXIT_FAILURE);
             }
         } else {
-            //TODO throw error about not enough arguments
+            try {
+                int linenum = stoi(line[0]);
+              	if(linenum>99 or linenum<0) {
+                	cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
+                  	exit(EXIT_FAILURE);
+                }
+                address_map.insert({linenum, program_size});
+            } catch(invalid_argument& e) {
+                cerr<<"Invalid line number after " << line[0] << ". Too few arguements."<<endl;
+                exit(EXIT_FAILURE);
+            } catch(exception e)
+            {
+              	cerr<<"Line number too large after " << line[0] << ". Too few arguements."<<endl;
+                exit(EXIT_FAILURE);
+            }
         }
     }
     return sml_stream.str();
@@ -154,14 +161,15 @@ string compiler::input(vector<string> *cmd) {
         if(ALPHA.find(var) != string::npos) {
             vars.insert(var);
         } else {
-            //TODO throw error for invalid variable
+            cerr << "Invalid id name \"" << var << " on line " << cmd->at(0) << endl;
+          	exit(EXIT_FAILURE);
         }
         stringstream sml;
         sml << "10" << var << endl;
         return sml.str();
     } else {
-        //TODO correct exception for bad parameter (invalid command)
-      	throw invalid_argument("IT BROKE");
+        cerr<<"Invalid argument to input on line " << cmd->at(0)<<endl;
+      	exit(EXIT_FAILURE);
     }
 }
 
@@ -176,13 +184,15 @@ string compiler::output(vector<string> *cmd) {
         if(ALPHA.find(var) != string::npos) {
             vars.insert(var);
         } else {
-            //TODO throw error for invalid variable
+            cerr<<"Invalid variable \"" << var << "\" on line " << cmd->at(0)<<endl;
+      		exit(EXIT_FAILURE);
         }
         stringstream sml;
         sml << "11" << var << endl;
         return sml.str();
     } else {
-        //TODO throw exception for invalid command format
+        cerr<<"Invalid command format on line " << cmd->at(0)<<endl;
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -191,18 +201,23 @@ string compiler::_goto(vector<string> *cmd) {
       	int linenum;
       	try {
             linenum = stoi(cmd->at(2));
-            //TODO check that linenum is within 0 to 100
+            if(linenum>99 or linenum<0)
+            {
+          		cerr<<"Line pointer out of bounds on line " << cmd->at(0)<<endl;
+      			exit(EXIT_FAILURE);
+            }
             addresses.insert(linenum);
         } catch(invalid_argument& e) {
-            //TODO handle error of invalid linenum
-          	linenum = -1; //TODO this will screw up further but we'll deal with that later
-        } //TODO possibly also handle out_of_range for int max/min value
+            cerr<<"Invalid line number on line " << cmd->at(0)<<endl;
+      		exit(EXIT_FAILURE);
+        }
       	stringstream sml;
         sml << "40a" << linenum << endl; //puts temporary value starting with 'a'
       	string ret = sml.str();
         return ret;
     } else {
-      	//TODO throw error on invalid number of args
+      	cerr<<"Invalid number of arguments on line " << cmd->at(0)<<endl;
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -240,7 +255,8 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         if(ALPHA.find(var) != string::npos) {
             vars.insert(var);
         } else {
-            //TODO throw error for invalid variable
+            cerr<<"Invalid ID on line " << cmd->at(0)<<endl;
+        	exit(EXIT_FAILURE);
         }
         stringstream sml;
      	for(auto token : postfix) {
@@ -248,7 +264,8 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         }
         //TODO put stuff into accumulator
     } else {
-        //TODO throw exception for invalid command format
+      	cerr << "Invalid command format on line "<<cmd->at(0)<<endl;
+      	exit(EXIT_FAILURE);
     }
 }
 
@@ -287,15 +304,18 @@ string compiler::second_parse(string partial_sml) {
       	try {
             int replace = address_map.at(*iter);
             string newstr = fmt(to_string(replace), 2, '0');
-//            cout << "a" + to_string(*iter) << " -> " << newstr << endl; //TODO remove
             partial_sml = replace_all(partial_sml, "a" + to_string(*iter), newstr);
-        } catch (out_of_range& e) {
-          	//TODO catch the error of unknown address reference
+        } catch (exception e) {
+          	cerr << "Out of range exception thrown due to invalid reference to position in array (add="<<&iter<<"). DUMP FOLLOWS: "<<endl;
+          	for(auto i : addresses)
+            {
+            	cerr << i<<endl;
+            }
+          	exit(EXIT_FAILURE);
         }
     }
     //Replace stack variables
     for(int i = 0; i < stack_size; i++) {
-//        cout << "a" + to_string(i) << " -> " << fmt(to_string(program_size), 2, '0') << endl; //TODO remove
         string newstr = fmt(to_string(program_size), 2, '0');
         partial_sml = replace_all(partial_sml, "s" + to_string(i), newstr) + "0000\n";
         program_size++;
@@ -310,11 +330,8 @@ string compiler::second_parse(string partial_sml) {
     }
     
     //Replace variables
-    for(auto iter = vars.begin(); iter != vars.end(); iter++) {
-        string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, *iter, newstr) + "0000\n";
-        program_size++;
-    }
+    
+  
     return partial_sml;
 }
 
