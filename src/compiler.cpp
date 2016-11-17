@@ -32,8 +32,8 @@ void compiler::compile(string infile, string outfile) {
 
 // note that ostream and istream will not be closed within this. 
 void compiler::compile(istream *in, ostream *out) {
-  	compiler cpl;
-  	string sml = cpl.get_sml(in);
+    compiler cpl;
+    string sml = cpl.get_sml(in);
     (*out) << sml;
 }
 
@@ -118,7 +118,7 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
             } else if(command == "if") {
               	
             } else if(command == "let") {
-          	    tuple<string,int> cmd = let(&line);
+          	tuple<string,int> cmd = let(&line);
                 sml_stream << get<0>(cmd);
                 program_size += get<1>(cmd);
             } else if(command == "end") {
@@ -130,10 +130,11 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
             }
         } else {
             try {
+                cerr << "\u001B[31mHere\u001B[0m\n"; //TODO remove
                 int linenum = stoi(line[0]);
               	if(linenum>99 or linenum<0) {
-                	cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
-                  	exit(EXIT_FAILURE);
+                    cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
+                    exit(EXIT_FAILURE);
                 }
                 address_map.insert({linenum, program_size});
             } catch(invalid_argument& e) {
@@ -222,29 +223,46 @@ string compiler::_goto(vector<string> *cmd) {
 }
 
 /**
+ * Tests if value is a number or a valid variable name
+ * @param value String to be evaluated as numerical
+ * @return Returns true if the value is a valid numerical symbol
+ */
+bool numerical(string value) {
+    if(ALPHA.find(value) != string::npos)
+        return true;
+    try {
+        stoi(value);
+        return true;
+    } catch(exception& e) {
+        return false;
+    }
+}
+
+/**
  * Writes SML for let command, adding variables to instance list
  * @param cmd Tokenized SIMPLE let command (<linenum> let <var> = <term>)
  * @return Returns tuple containing (full SML string, number of SML lines)
  *
  * Algorithm:
- *	 - start after equals sign and convert to postfix
- *   if( token is numerical ) {
- *   	- load token to accumulator
- *      if( next token is numerical ) {
- *      	- store token to top of stack (labeled in temporary SML as "s1" for stack number 1 - starting at 0)
- *     		- increment stack pointer (not an actual address but a number of stack space necessary)
- *  	else if( next token is operator ) {
- * 			- do nothing yet
- * 	 if( token is operator ) {
+ *      - start after equals sign and convert to postfix
+ *  if( token is numerical ):
+ *      - load token to accumulator
+ *      if( next token is numerical ):
+ *          - store token to top of stack (labeled in temporary SML as "s1" for stack number 1 - starting at 0)
+ *          - increment stack pointer (not an actual address but a number of stack space necessary)
+ *  	else if( next token is operator ):
+ *          - do nothing yet
+ *  if( token is operator ):
  *  	- apply operator to top of stack (i.e. x y * sees "*" and multiplies by top of stack (representing x))
- * 		- decrement stack size pointer (to show that value is no longer needed and can be overwritten)
- *  	if( next token does not exists (i.e. is end of command) ) {
- * 			- store result to variable before equals sign
- * 		else if( next token exists ) {
- * 			- store result to top of stack and increment stack size pointer
- * 	 - possible sources of error:
- * 		- number of ops does not decrement stack pointer to zero (some values never used)
- * 		- last token is a number
+ * 	- decrement stack size pointer (to show that value is no longer needed and can be overwritten)
+ *  	if( next token does not exists (i.e. is end of command) ):
+ *          - store result to variable before equals sign
+ * 	else if( next token exists ) {
+ *          - store result to top of stack and increment stack size pointer
+ *  - possible sources of error:
+ *      - number of ops does not decrement stack pointer to zero (some values never used)
+ *      - last token is a number
+ *      - negative constants
  */
 tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
@@ -259,9 +277,51 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         	exit(EXIT_FAILURE);
         }
         stringstream sml;
-     	for(auto token : postfix) {
-            
+	string operators="-+*/";
+        int stack_ptr = 0, cmd_size = 0;
+     	for(auto token = postfix.begin(); token <= postfix.end(); token++) {
+            if(operators.find(*token) != string::npos && token->size() == 1) {
+                //TODO operator sequence
+                sml << (30 + operators.find(*token)) << "s" << stack_ptr <<endl;
+                stack_ptr--;
+                cmd_size++;
+                if(token+1 > postfix.end()) {
+                    sml << "21" << var << endl;
+                    cmd_size++;
+                } else {
+                    sml << "21s" << stack_ptr << endl;
+                    stack_ptr++;
+                    cmd_size++;
+                }
+            } else {
+                if(ALPHA.find(*token) != string::npos && token->size() == 1) {
+                    sml << "20" << *token << endl;
+                    cmd_size++;
+                } else {
+                    try {
+                        int num = stoi(*token);
+                        sml << "20c" << num << endl;
+                        constants.insert(num);
+                        cmd_size++;
+                    } catch(invalid_argument& e) {
+                        //TODO catch invalid argument
+                    } catch(out_of_range& e) {
+                        //TODO catch out of range
+                    }
+                }
+                
+                if(token+1 > postfix.end()) {
+                    //TODO you have a problem if it ends in a number
+                } else if(operators.find(*(token+1)) != string::npos) {
+                    //TODO nothing because next is an operator
+                } else if(numerical(*(token+1))) {
+                    sml << "21s" << stack_ptr << endl;
+                    stack_ptr++;
+                    cmd_size++;
+                }
+            }
         }
+        return make_tuple(sml.str(), cmd_size);
         //TODO put stuff into accumulator
     } else {
       	cerr << "Invalid command format on line "<<cmd->at(0)<<endl;

@@ -23,7 +23,7 @@ public:
     static std::string replace_all(std::string, std::string, std::string); //search and replace all in string
     static std::string fmt(std::string, int size, char fill); //formats string with leading characters
     static void compile(std::string, std::string); //compiles from one file into another
-private: //TODO reapply private label
+//private: //TODO reapply private label
     static void compile(std::istream*, std::ostream*); //converter method makes a compiler instance and writes outoput to ostream
     explicit compiler();
   	virtual ~compiler();
