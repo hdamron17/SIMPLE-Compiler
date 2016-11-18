@@ -13,7 +13,7 @@ int main() {
             "12 input y\n"
             "12 goto 20\n"
             "14 rem hello steven\n"
-//            "15 let z = y + x\n"
+            "15 let z = y + x * 4\n"
             "20 output x\n"
             "21 end\n";
     

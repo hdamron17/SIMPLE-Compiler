@@ -130,18 +130,18 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
             }
         } else {
             try {
-                cerr << "\u001B[31mHere\u001B[0m\n"; //TODO remove
-                int linenum = stoi(line[0]);
+                int linenum = stoi(line.at(0));
               	if(linenum>99 or linenum<0) {
                     cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
                     exit(EXIT_FAILURE);
                 }
                 address_map.insert({linenum, program_size});
+            } catch(out_of_range& e) {
+                //TODO error checking ... Brennan
             } catch(invalid_argument& e) {
                 cerr<<"Invalid line number after " << line[0] << ". Too few arguements."<<endl;
                 exit(EXIT_FAILURE);
-            } catch(exception e)
-            {
+            } catch(exception e) {
               	cerr<<"Line number too large after " << line[0] << ". Too few arguements."<<endl;
                 exit(EXIT_FAILURE);
             }
@@ -266,7 +266,7 @@ bool numerical(string value) {
  */
 tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
-        vector<string> infix(cmd->begin()+3, cmd->end());
+        vector<string> infix(cmd->begin()+4, cmd->end());
         vector<string> postfix = to_postfix(infix);
         
         string var = cmd->at(2);
@@ -279,13 +279,12 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         stringstream sml;
 	string operators="-+*/";
         int stack_ptr = 0, cmd_size = 0;
-     	for(auto token = postfix.begin(); token <= postfix.end(); token++) {
+     	for(auto token = postfix.begin(); token < postfix.end(); token++) {
             if(operators.find(*token) != string::npos && token->size() == 1) {
-                //TODO operator sequence
-                sml << (30 + operators.find(*token)) << "s" << stack_ptr <<endl;
+                sml << (30 + operators.find(*token)) << "s" << stack_ptr-1 <<endl;
                 stack_ptr--;
                 cmd_size++;
-                if(token+1 > postfix.end()) {
+                if(token+1 == postfix.end()) {
                     sml << "21" << var << endl;
                     cmd_size++;
                 } else {
@@ -295,6 +294,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                 }
             } else {
                 if(ALPHA.find(*token) != string::npos && token->size() == 1) {
+                    vars.insert(*token);
                     sml << "20" << *token << endl;
                     cmd_size++;
                 } else {
@@ -320,9 +320,10 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     cmd_size++;
                 }
             }
+            if(stack_ptr > stack_size)
+                stack_size = stack_ptr;
         }
         return make_tuple(sml.str(), cmd_size);
-        //TODO put stuff into accumulator
     } else {
       	cerr << "Invalid command format on line "<<cmd->at(0)<<endl;
       	exit(EXIT_FAILURE);
@@ -389,7 +390,7 @@ string compiler::second_parse(string partial_sml) {
         program_size++;
     }
     
-    //Replace variables
+    //TODO TODO TODO Replace variables
     
   
     return partial_sml;

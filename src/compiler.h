@@ -26,7 +26,7 @@ public:
 //private: //TODO reapply private label
     static void compile(std::istream*, std::ostream*); //converter method makes a compiler instance and writes outoput to ostream
     explicit compiler();
-  	virtual ~compiler();
+    virtual ~compiler();
     
     std::string get_sml(std::istream*);
   
