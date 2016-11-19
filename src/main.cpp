@@ -13,7 +13,7 @@ int main() {
             "12 input y\n"
             "13 if x > y goto 20\n"
             "14 rem hello steven\n"
-            "15 let z = y + x * 4\n"
+            "15 let x = y + x * 4 * ( 2 + y )\n"
             "20 output x\n"
             "21 end\n";
     

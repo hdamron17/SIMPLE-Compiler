@@ -351,7 +351,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         	exit(EXIT_FAILURE);
         }
         stringstream sml;
-	string operators="-+*/";
+	string operators="+-/*";
         int stack_ptr = 0, cmd_size = 0;
      	for(auto token = postfix.begin(); token < postfix.end(); token++) {
             if(operators.find(*token) != string::npos && token->size() == 1) {
@@ -361,7 +361,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                 if(token+1 == postfix.end()) {
                     sml << "21" << var << endl;
                     cmd_size++;
-                } else {
+                } else if( !(operators.find(*(token+1)) != string::npos && token->size() == 1) ){
                     sml << "21s" << stack_ptr << endl;
                     stack_ptr++;
                     cmd_size++;
