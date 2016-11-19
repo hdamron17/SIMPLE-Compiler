@@ -11,7 +11,7 @@ int main() {
     simple <<
             "10 input x\n"
             "12 input y\n"
-            "12 goto 20\n"
+            "13 if x > y goto 20\n"
             "14 rem hello steven\n"
             "15 let z = y + x * 4\n"
             "20 output x\n"

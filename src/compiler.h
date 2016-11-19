@@ -38,6 +38,7 @@ public:
     std::string output(std::vector<std::string>*);
     std::tuple<std::string,int> let(std::vector<std::string>*);
     std::string _goto(std::vector<std::string>*);
+    std::string _if(std::vector<std::string>*);
     
     std::string second_parse(std::string);
     

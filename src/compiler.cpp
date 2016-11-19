@@ -197,6 +197,80 @@ string compiler::output(vector<string> *cmd) {
     }
 }
 
+string compiler::_if(vector<string> *cmd) 
+{
+    if(cmd->size()==7)
+    {
+      	//Get id1
+        string id1 = cmd->at(2);
+        if(ALPHA.find(id1) != string::npos) {
+            vars.insert(id1);
+        } else {
+            cerr<<"Invalid variable \"" << id1 << "\" on line " << cmd->at(0)<<endl;
+      		exit(EXIT_FAILURE);
+        }
+      	//get id2
+      	string id2 = cmd->at(4);
+        if(ALPHA.find(id2) != string::npos) {
+            vars.insert(id2);
+        } else {
+            cerr<<"Invalid variable \"" << id2 << "\" on line " << cmd->at(0)<<endl;
+      		exit(EXIT_FAILURE);
+        }
+      	//get the address
+      	int address;
+      	try {
+            address = stoi(cmd->at(6));
+            if(address>99 or address<0)
+            {
+                cerr<<"Goto address out of bounds " << cmd->at(0)<<endl;
+                exit(EXIT_FAILURE);
+            }
+        } catch(invalid_argument& e) {
+            cerr<<"Invalid goto address on line " << cmd->at(0)<<endl;
+      		exit(EXIT_FAILURE);
+        }
+        stringstream sml;
+        string relop = cmd->at(3);
+        if(relop == "==") {
+            sml << "10" << id1 << endl;
+            sml << "31" << id2 << endl;
+            sml << "42" << address << endl;
+            program_size += 3;
+        } else if(relop == "!=") {
+            sml << "10" << id1 << endl;
+            sml << "31" << id2 << endl;
+            sml << "42" << program_size+5 << endl;
+            sml << "40" << address<<endl;
+            program_size += 4;
+        } else if(relop == ">=") {
+            sml << "10" << id2 << endl;
+            sml << "31" << id1 << endl;
+            sml << "41" << address << endl;
+            sml << "42" << address << endl;
+            program_size += 4;
+        } else if(relop == "<=") {
+            sml << "10" << id1 << endl;
+            sml << "31" << id2 << endl;
+            sml << "41" << address << endl;
+            sml << "42" << address << endl;
+            program_size += 4;
+        } else if(relop == ">") {
+            sml << "10" << id2 << endl;
+            sml << "31" << id1 << endl;
+            sml << "41" << address<< endl;
+            program_size += 3;
+        } else if(relop == "<") {
+            sml << "10" << id1 << endl;
+            sml << "31" << id2 << endl;
+            sml << "41" << address<< endl;
+            program_size += 3;
+        } else {
+            //TODO KILL SELF
+        }
+    }
+}
+
 string compiler::_goto(vector<string> *cmd) {
   	if(cmd->size() == 3) {
       	int linenum;
@@ -391,7 +465,11 @@ string compiler::second_parse(string partial_sml) {
     }
     
     //TODO TODO TODO Replace variables
-    
+    for(string var : vars) {
+        string newstr = fmt(to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, var, newstr) + "0000\n";
+        program_size++;
+    }
   
     return partial_sml;
 }
