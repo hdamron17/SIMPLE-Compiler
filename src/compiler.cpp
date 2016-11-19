@@ -32,8 +32,8 @@ void compiler::compile(string infile, string outfile) {
 
 // note that ostream and istream will not be closed within this. 
 void compiler::compile(istream *in, ostream *out) {
-    compiler cpl;
-    string sml = cpl.get_sml(in);
+  	compiler cpl;
+  	string sml = cpl.get_sml(in);
     (*out) << sml;
 }
 
@@ -116,9 +116,10 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
                 sml_stream << _goto(&line);
                 program_size++;
             } else if(command == "if") {
-              	
+              	sml_stream << _if(&line);
+                program_size++;
             } else if(command == "let") {
-          	tuple<string,int> cmd = let(&line);
+          	    tuple<string,int> cmd = let(&line);
                 sml_stream << get<0>(cmd);
                 program_size += get<1>(cmd);
             } else if(command == "end") {
@@ -130,18 +131,17 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
             }
         } else {
             try {
-                int linenum = stoi(line.at(0));
+                int linenum = stoi(line[0]);
               	if(linenum>99 or linenum<0) {
-                    cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
-                    exit(EXIT_FAILURE);
+                	cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
+                  	exit(EXIT_FAILURE);
                 }
                 address_map.insert({linenum, program_size});
-            } catch(out_of_range& e) {
-                //TODO error checking ... Brennan
             } catch(invalid_argument& e) {
                 cerr<<"Invalid line number after " << line[0] << ". Too few arguements."<<endl;
                 exit(EXIT_FAILURE);
-            } catch(exception e) {
+            } catch(exception e)
+            {
               	cerr<<"Line number too large after " << line[0] << ". Too few arguements."<<endl;
                 exit(EXIT_FAILURE);
             }
@@ -199,22 +199,22 @@ string compiler::output(vector<string> *cmd) {
 
 string compiler::_if(vector<string> *cmd) 
 {
-    if(cmd->size()==7)
+  	if(cmd->size()==7)
     {
       	//Get id1
-        string id1 = cmd->at(2);
-        if(ALPHA.find(id1) != string::npos) {
-            vars.insert(id1);
+		string id1 = cmd->at(2);
+        if(ALPHA.find(var) != string::npos) {
+            vars.insert(var);
         } else {
-            cerr<<"Invalid variable \"" << id1 << "\" on line " << cmd->at(0)<<endl;
+            cerr<<"Invalid variable \"" << var << "\" on line " << cmd->at(0)<<endl;
       		exit(EXIT_FAILURE);
         }
       	//get id2
       	string id2 = cmd->at(4);
-        if(ALPHA.find(id2) != string::npos) {
-            vars.insert(id2);
+        if(ALPHA.find(var) != string::npos) {
+            vars.insert(var);
         } else {
-            cerr<<"Invalid variable \"" << id2 << "\" on line " << cmd->at(0)<<endl;
+            cerr<<"Invalid variable \"" << var << "\" on line " << cmd->at(0)<<endl;
       		exit(EXIT_FAILURE);
         }
       	//get the address
@@ -223,52 +223,54 @@ string compiler::_if(vector<string> *cmd)
             address = stoi(cmd->at(6));
             if(address>99 or address<0)
             {
-                cerr<<"Goto address out of bounds " << cmd->at(0)<<endl;
-                exit(EXIT_FAILURE);
+          		cerr<<"Goto address out of bounds " << cmd->at(0)<<endl;
+      			exit(EXIT_FAILURE);
             }
         } catch(invalid_argument& e) {
             cerr<<"Invalid goto address on line " << cmd->at(0)<<endl;
       		exit(EXIT_FAILURE);
         }
         stringstream sml;
-        string relop = cmd->at(3);
-        if(relop == "==") {
-            sml << "10" << id1 << endl;
-            sml << "31" << id2 << endl;
-            sml << "42" << address << endl;
-            program_size += 3;
-        } else if(relop == "!=") {
-            sml << "10" << id1 << endl;
-            sml << "31" << id2 << endl;
-            sml << "42" << program_size+5 << endl;
-            sml << "40" << address<<endl;
-            program_size += 4;
-        } else if(relop == ">=") {
-            sml << "10" << id2 << endl;
-            sml << "31" << id1 << endl;
-            sml << "41" << address << endl;
-            sml << "42" << address << endl;
-            program_size += 4;
-        } else if(relop == "<=") {
-            sml << "10" << id1 << endl;
-            sml << "31" << id2 << endl;
-            sml << "41" << address << endl;
-            sml << "42" << address << endl;
-            program_size += 4;
-        } else if(relop == ">") {
-            sml << "10" << id2 << endl;
-            sml << "31" << id1 << endl;
-            sml << "41" << address<< endl;
-            program_size += 3;
-        } else if(relop == "<") {
-            sml << "10" << id1 << endl;
-            sml << "31" << id2 << endl;
-            sml << "41" << address<< endl;
-            program_size += 3;
-        } else {
-            //TODO KILL SELF
+        switch(cmd->at(3)) //Get the relop
+        {
+            case "==":
+          		sml << "10" <<id1<<endl;
+          		sml << "31" << id2 <<endl;
+                sml << "41" << programsize+5<<endl;
+          		sml << "40" << address<<endl;
+                break;
+            case "!=":
+          		sml << "10" << id1 << endl;
+          		sml << "31" << id2 << endl;
+          		sml << "42" << address << endl;
+                break;
+            case ">=":
+              	sml << "10" << id2 << endl;
+          		sml << "31" << id1 << endl;
+                sml << "41" << address<< endl;
+				sml << "42" << address << endl;
+                break;
+            case "<=":
+				sml << "10" << id1 << endl;
+          		sml << "31" << id2 << endl;
+                sml << "41" << address<< endl;
+				sml << "42" << address << endl;
+                break;
+            case ">":
+				sml << "10" << id2 << endl;
+          		sml << "31" << id1 << endl;
+                sml << "41" << address<< endl;
+                break;
+            case "<":
+				sml << "10" << id1 << endl;
+          		sml << "31" << id2 << endl;
+                sml << "41" << address<< endl;
+          		
+                break;
+          	default:
+          		//TODO KILL SELF
         }
-    }
+	}
 }
 
 string compiler::_goto(vector<string> *cmd) {
@@ -297,50 +299,33 @@ string compiler::_goto(vector<string> *cmd) {
 }
 
 /**
- * Tests if value is a number or a valid variable name
- * @param value String to be evaluated as numerical
- * @return Returns true if the value is a valid numerical symbol
- */
-bool numerical(string value) {
-    if(ALPHA.find(value) != string::npos)
-        return true;
-    try {
-        stoi(value);
-        return true;
-    } catch(exception& e) {
-        return false;
-    }
-}
-
-/**
  * Writes SML for let command, adding variables to instance list
  * @param cmd Tokenized SIMPLE let command (<linenum> let <var> = <term>)
  * @return Returns tuple containing (full SML string, number of SML lines)
  *
  * Algorithm:
- *      - start after equals sign and convert to postfix
- *  if( token is numerical ):
- *      - load token to accumulator
- *      if( next token is numerical ):
- *          - store token to top of stack (labeled in temporary SML as "s1" for stack number 1 - starting at 0)
- *          - increment stack pointer (not an actual address but a number of stack space necessary)
- *  	else if( next token is operator ):
- *          - do nothing yet
- *  if( token is operator ):
+ *	 - start after equals sign and convert to postfix
+ *   if( token is numerical ) {
+ *   	- load token to accumulator
+ *      if( next token is numerical ) {
+ *      	- store token to top of stack (labeled in temporary SML as "s1" for stack number 1 - starting at 0)
+ *     		- increment stack pointer (not an actual address but a number of stack space necessary)
+ *  	else if( next token is operator ) {
+ * 			- do nothing yet
+ * 	 if( token is operator ) {
  *  	- apply operator to top of stack (i.e. x y * sees "*" and multiplies by top of stack (representing x))
- * 	- decrement stack size pointer (to show that value is no longer needed and can be overwritten)
- *  	if( next token does not exists (i.e. is end of command) ):
- *          - store result to variable before equals sign
- * 	else if( next token exists ) {
- *          - store result to top of stack and increment stack size pointer
- *  - possible sources of error:
- *      - number of ops does not decrement stack pointer to zero (some values never used)
- *      - last token is a number
- *      - negative constants
+ * 		- decrement stack size pointer (to show that value is no longer needed and can be overwritten)
+ *  	if( next token does not exists (i.e. is end of command) ) {
+ * 			- store result to variable before equals sign
+ * 		else if( next token exists ) {
+ * 			- store result to top of stack and increment stack size pointer
+ * 	 - possible sources of error:
+ * 		- number of ops does not decrement stack pointer to zero (some values never used)
+ * 		- last token is a number
  */
 tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
-        vector<string> infix(cmd->begin()+4, cmd->end());
+        vector<string> infix(cmd->begin()+3, cmd->end());
         vector<string> postfix = to_postfix(infix);
         
         string var = cmd->at(2);
@@ -351,53 +336,10 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         	exit(EXIT_FAILURE);
         }
         stringstream sml;
-	string operators="-+*/";
-        int stack_ptr = 0, cmd_size = 0;
-     	for(auto token = postfix.begin(); token < postfix.end(); token++) {
-            if(operators.find(*token) != string::npos && token->size() == 1) {
-                sml << (30 + operators.find(*token)) << "s" << stack_ptr-1 <<endl;
-                stack_ptr--;
-                cmd_size++;
-                if(token+1 == postfix.end()) {
-                    sml << "21" << var << endl;
-                    cmd_size++;
-                } else {
-                    sml << "21s" << stack_ptr << endl;
-                    stack_ptr++;
-                    cmd_size++;
-                }
-            } else {
-                if(ALPHA.find(*token) != string::npos && token->size() == 1) {
-                    vars.insert(*token);
-                    sml << "20" << *token << endl;
-                    cmd_size++;
-                } else {
-                    try {
-                        int num = stoi(*token);
-                        sml << "20c" << num << endl;
-                        constants.insert(num);
-                        cmd_size++;
-                    } catch(invalid_argument& e) {
-                        //TODO catch invalid argument
-                    } catch(out_of_range& e) {
-                        //TODO catch out of range
-                    }
-                }
-                
-                if(token+1 > postfix.end()) {
-                    //TODO you have a problem if it ends in a number
-                } else if(operators.find(*(token+1)) != string::npos) {
-                    //TODO nothing because next is an operator
-                } else if(numerical(*(token+1))) {
-                    sml << "21s" << stack_ptr << endl;
-                    stack_ptr++;
-                    cmd_size++;
-                }
-            }
-            if(stack_ptr > stack_size)
-                stack_size = stack_ptr;
+     	for(auto token : postfix) {
+            
         }
-        return make_tuple(sml.str(), cmd_size);
+        //TODO put stuff into accumulator
     } else {
       	cerr << "Invalid command format on line "<<cmd->at(0)<<endl;
       	exit(EXIT_FAILURE);
@@ -464,12 +406,8 @@ string compiler::second_parse(string partial_sml) {
         program_size++;
     }
     
-    //TODO TODO TODO Replace variables
-    for(string var : vars) {
-        string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, var, newstr) + "0000\n";
-        program_size++;
-    }
+    //Replace variables
+    
   
     return partial_sml;
 }

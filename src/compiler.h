@@ -23,10 +23,10 @@ public:
     static std::string replace_all(std::string, std::string, std::string); //search and replace all in string
     static std::string fmt(std::string, int size, char fill); //formats string with leading characters
     static void compile(std::string, std::string); //compiles from one file into another
-//private: //TODO reapply private label
+private: //TODO reapply private label
     static void compile(std::istream*, std::ostream*); //converter method makes a compiler instance and writes outoput to ostream
     explicit compiler();
-    virtual ~compiler();
+  	virtual ~compiler();
     
     std::string get_sml(std::istream*);
   
@@ -38,10 +38,9 @@ public:
     std::string output(std::vector<std::string>*);
     std::tuple<std::string,int> let(std::vector<std::string>*);
     std::string _goto(std::vector<std::string>*);
-    std::string _if(std::vector<std::string>*);
     
     std::string second_parse(std::string);
-    
+    string compiler::_if(vector<string> *cmd);
     int precedence(std::string, std::string); //TODO could be const but would not compile
     std::vector<std::string> to_postfix(std::vector<std::string>); //TODO same as above about const
 
