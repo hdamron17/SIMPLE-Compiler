@@ -116,7 +116,8 @@ string compiler::make_sml(vector<vector<string>> *simple_code) {
                 sml_stream << _goto(&line);
                 program_size++;
             } else if(command == "if") {
-              	
+              	sml_stream << _if(&line);
+                // No need to change program size because Brennan did in the function
             } else if(command == "let") {
           	tuple<string,int> cmd = let(&line);
                 sml_stream << get<0>(cmd);
@@ -230,44 +231,49 @@ string compiler::_if(vector<string> *cmd)
             cerr<<"Invalid goto address on line " << cmd->at(0)<<endl;
       		exit(EXIT_FAILURE);
         }
+        addresses.insert(address);
+        
         stringstream sml;
         string relop = cmd->at(3);
         if(relop == "==") {
-            sml << "10" << id1 << endl;
+            sml << "20" << id1 << endl;
             sml << "31" << id2 << endl;
-            sml << "42" << address << endl;
+            sml << "42a" << address << endl;
             program_size += 3;
         } else if(relop == "!=") {
-            sml << "10" << id1 << endl;
+            sml << "20" << id1 << endl;
             sml << "31" << id2 << endl;
             sml << "42" << program_size+5 << endl;
-            sml << "40" << address<<endl;
+            sml << "40a" << address<<endl;
             program_size += 4;
         } else if(relop == ">=") {
-            sml << "10" << id2 << endl;
+            sml << "20" << id2 << endl;
             sml << "31" << id1 << endl;
-            sml << "41" << address << endl;
-            sml << "42" << address << endl;
+            sml << "41a" << address << endl;
+            sml << "42a" << address << endl;
             program_size += 4;
         } else if(relop == "<=") {
-            sml << "10" << id1 << endl;
+            sml << "20" << id1 << endl;
             sml << "31" << id2 << endl;
-            sml << "41" << address << endl;
-            sml << "42" << address << endl;
+            sml << "41a" << address << endl;
+            sml << "42a" << address << endl;
             program_size += 4;
         } else if(relop == ">") {
-            sml << "10" << id2 << endl;
+            sml << "20" << id2 << endl;
             sml << "31" << id1 << endl;
-            sml << "41" << address<< endl;
+            sml << "41a" << address<< endl;
             program_size += 3;
         } else if(relop == "<") {
-            sml << "10" << id1 << endl;
+            sml << "20" << id1 << endl;
             sml << "31" << id2 << endl;
-            sml << "41" << address<< endl;
+            sml << "41a" << address<< endl;
             program_size += 3;
         } else {
             //TODO KILL SELF
         }
+        return sml.str();
+    } else {
+        //TODO error on invalid number of argments
     }
 }
 
