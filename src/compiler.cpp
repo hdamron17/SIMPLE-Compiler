@@ -455,12 +455,6 @@ string compiler::second_parse(string partial_sml) {
           	exit(EXIT_FAILURE);
         }
     }
-    //Replace stack variables
-    for(int i = 0; i < stack_size; i++) {
-        string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, "s" + to_string(i), newstr) + "0000\n";
-        program_size++;
-    }
     
     //Replace constants
     for(auto iter = constants.begin(); iter != constants.end(); iter++) {
@@ -470,10 +464,16 @@ string compiler::second_parse(string partial_sml) {
         program_size++;
     }
     
-    //TODO TODO TODO Replace variables
+    //Replace stack variables
+    for(int i = 0; i < stack_size; i++) {
+        string newstr = fmt(to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, "s" + to_string(i), newstr) + "0000\n"; //TODO remove added zeros
+        program_size++; 
+    }
+    
     for(string var : vars) {
         string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, var, newstr) + "0000\n";
+        partial_sml = replace_all(partial_sml, var, newstr) + "0000\n"; // TODO remove added zeros
         program_size++;
     }
   
