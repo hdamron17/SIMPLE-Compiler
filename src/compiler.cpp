@@ -364,16 +364,16 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                 sml << (30 + operators.find(*token)) << "s" << stack_ptr-1 <<endl;
                 stack_ptr--;
                 cmd_size++;
-                if(token+1 == postfix.end()) {
+                if(token+1 == postfix.end()) {//checks if at end
                     sml << "21" << var << endl;
                     cmd_size++;
-                } else if( !(operators.find(*(token+1)) != string::npos && token->size() == 1) ){
+                } else if( !(operators.find(*(token+1)) != string::npos && token->size() == 1) ){ //checks if next is an op
                     sml << "21s" << stack_ptr << endl;
                     stack_ptr++;
                     cmd_size++;
                 }
             } else {
-                if(ALPHA.find(*token) != string::npos && token->size() == 1) {
+                if(ALPHA.find(*token) != string::npos && token->size() == 1) {//checks if the next is an id
                     vars.insert(*token);
                     sml << "20" << *token << endl;
                     cmd_size++;
@@ -394,7 +394,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     //TODO you have a problem if it ends in a number
                 } else if(operators.find(*(token+1)) != string::npos) {
                     //TODO nothing because next is an operator
-                } else if(numerical(*(token+1))) {
+                } else if(numerical(*(token+1))) {//checks if next is numerical
                     sml << "21s" << stack_ptr << endl;
                     stack_ptr++;
                     cmd_size++;
