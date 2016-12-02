@@ -16,6 +16,5 @@ int main() {
             "15 let x = y + x * 4 * ( 2 + y )\n"
             "20 output x\n"
             "21 end\n";
-    
     compiler::compile(&simple, &cout);
 }
