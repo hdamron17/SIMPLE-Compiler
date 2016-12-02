@@ -344,7 +344,7 @@ bool numerical(string value) {
  *      - last token is a number
  *      - negative constants
  */
-tuple<string,int> compiler::let(vector<string> *cmd) {
+tuple<string,int> compiler::OLD_let(vector<string> *cmd) { // TODO remove
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
         vector<string> infix(cmd->begin()+4, cmd->end());
         vector<string> postfix = to_postfix(infix);
@@ -359,9 +359,10 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         stringstream sml;
 	string operators="+-/*";
         int stack_ptr = 0, cmd_size = 0;
-     	for(auto token = postfix.begin(); token < postfix.end(); token++) {
+     	for(vector<string>::iterator token = postfix.begin(); token < postfix.end(); token++) {
             if(operators.find(*token) != string::npos && token->size() == 1) {
-                sml << (30 + operators.find(*token)) << "s" << stack_ptr-1 <<endl;
+                //Adds position of token in op string to 30 for correct op
+                sml << (30 + operators.find(*token)) << "S" << stack_ptr-1 <<endl;
                 stack_ptr--;
                 cmd_size++;
                 if(token+1 == postfix.end()) {//checks if at end
@@ -410,6 +411,83 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
     }
 }
 
+tuple<string,int> compiler::let(vector<string> *cmd) {
+    if(cmd->size() >= 5 && cmd->at(3) == "=") {
+        string final_var = "";
+        if(ALPHA.find(cmd->at(2)) != string::npos) {
+            final_var = cmd->at(2);
+        } else {
+            //TODO throw errors because variable is invalid
+        }
+        
+        vector<string> infix(cmd->begin()+4, cmd->end()); //with only math part
+        vector<string> postfix = to_postfix(infix); //math part to postfix
+        
+        stringstream sml;
+	string operators="+-/*";
+        stack<string> ids;
+        int let_size = 0;
+        int local_stack = 0;
+        //TODO check if there is only one token and store that to the final var
+        //TODO check if size of postfix is 2 because that is wrong
+        for(auto i = postfix.begin(); i < postfix.end(); i++) {
+            string token = (*i);
+            if(operators.find(token) != string::npos) { //pointing to operator
+                //TODO all of the operator stuff
+                string id2 = ids.top();
+                ids.pop();
+                string id1 = ids.top();
+                ids.pop();
+                if(id1[0] == 'S') //if it starts with S, it's popped off stack
+                    local_stack--;
+                if(id2[0] == 'S') //if it starts with S, it's popped off stack
+                    local_stack--;
+                int operation = 30 + operators.find(token);
+                //uses position plus 30 to convert to SML opcode
+                sml << "20" << id1 << endl //loads id1 into accumulator
+                    << operation << id2 << endl; //applies operator on acc with id2 param
+                if(i + 1 == postfix.end()) //last operator so save to final var
+                {
+                    sml << 21 << final_var << endl; //store to final var
+                }
+                else
+                {
+                    sml << 21 << "S" << local_stack << endl; //else store to stack
+                    ids.push("S" + to_string(local_stack)); //push the s to local stack
+                    local_stack++; //makes stack 1 larger
+                }
+                
+                let_size += 3; //each operator uses 3 SML ops
+                
+                if(local_stack + 1 > stack_size) //this requires more stack
+                    stack_size = local_stack;
+            } else { //hopefully pointing to constant or variable
+                if(ALPHA.find(token) != string::npos) { //valid variable
+                    ids.push(token);
+                    vars.insert(token);
+                } else { // now it may be a literal but we'll see about that
+                    int num = 0;
+                    try {
+                        num = stoi(token);
+                    } catch(invalid_argument& e) {
+                        //TODO error checking for invalid variable or literal
+                        cerr << "died\n"; //TODO remove
+                    } catch(out_of_range& e) {
+                        //TODO error checking for number too big
+                        cerr << "died\n"; //TODO remove
+                    }
+                    ids.push("C" + to_string(num));
+                    constants.insert(num);
+                }
+            }
+        }
+        return make_tuple(sml.str(), let_size);
+    } else {
+      	cerr << "Invalid command format on line "<<cmd->at(0)<<endl;
+      	exit(EXIT_FAILURE);
+    }
+}
+
 /**
  * Replaces temporary variable names with physical addresses for final SML code
  *      -Also checks that SML code fits within 100 op limit
@@ -445,7 +523,7 @@ string compiler::second_parse(string partial_sml) {
       	try {
             int replace = address_map.at(*iter);
             string newstr = fmt(to_string(replace), 2, '0');
-            partial_sml = replace_all(partial_sml, "a" + to_string(*iter), newstr);
+            partial_sml = replace_all(partial_sml, "A" + to_string(*iter), newstr);
         } catch (exception e) {
           	cerr << "Out of range exception thrown due to invalid reference to position in array (add="<<&iter<<"). DUMP FOLLOWS: "<<endl;
           	for(auto i : addresses)
@@ -459,7 +537,7 @@ string compiler::second_parse(string partial_sml) {
     //Replace constants
     for(auto iter = constants.begin(); iter != constants.end(); iter++) {
         string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, "c" + to_string(*iter), newstr)
+        partial_sml = replace_all(partial_sml, "C" + to_string(*iter), newstr)
                 + fmt(to_string(*iter), 4, '0') + "\n";
         program_size++;
     }
@@ -467,7 +545,7 @@ string compiler::second_parse(string partial_sml) {
     //Replace stack variables
     for(int i = 0; i < stack_size; i++) {
         string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, "s" + to_string(i), newstr) + "0000\n"; //TODO remove added zeros
+        partial_sml = replace_all(partial_sml, "S" + to_string(i), newstr) + "0000\n"; //TODO remove added zeros
         program_size++; 
     }
     
