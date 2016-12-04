@@ -33,7 +33,7 @@ public:
     std::vector<std::vector<std::string>> parse(std::istream*);
     std::string make_sml(std::vector<std::vector<std::string>>*);
     
-  //TODO figure out what we need to do for each command (function may only be necessary for let command)
+    //TODO figure out what we need to do for each command (function may only be necessary for let command)
     std::string input(std::vector<std::string>*);
     std::string output(std::vector<std::string>*);
     std::tuple<std::string,int> let(std::vector<std::string>*);
