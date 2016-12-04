@@ -18,4 +18,8 @@ int main() {
             "21 end\n";
     
     compiler::compile(&simple, &cout);
+//    compiler cpl;
+//    vector<string> testvec = vector<string>{"24", "let", "z", "=", "y", "+", "x", "*", "4", "*", "(", "2", "+", "y", ")"};
+//    tuple<string,int> test = cpl.let(&testvec);
+//    cout << get<0>(test) << endl;
 }

@@ -17,8 +17,7 @@
 #include <unordered_map>
 #include <map>
 
-class compiler 
-{
+class compiler {
 public:
     static std::vector<std::string> tokenize(std::string, std::string); //tokenizes string into a vector
     static std::string replace_all(std::string, std::string, std::string); //search and replace all in string
@@ -38,6 +37,7 @@ public:
     std::string input(std::vector<std::string>*);
     std::string output(std::vector<std::string>*);
     std::tuple<std::string,int> let(std::vector<std::string>*);
+    std::tuple<std::string,int> OLD_let(std::vector<std::string>*); //TODO remove
     std::string _goto(std::vector<std::string>*);
     std::string _if(std::vector<std::string>*);
     
@@ -49,14 +49,14 @@ public:
     std::vector<std::vector<std::string>> simple; //2D vector of simple code
   
     std::unordered_set<int> addresses; //Map of SIMPLE code addresses to SML addresses
-    //Note: needed addresses are written in the form a42 for address 42
+    //Note: needed addresses are written in the form A42 for address 42
     std::unordered_set<std::string> vars;
     //Note: all vars are single letters in SIMPLE code, but others are allowed
     std::unordered_set<int> constants;
-    //Note: constants are written in the form c42 for number 42
+    //Note: constants are written in the form A42 for number 42
     std::unordered_map<int,int> address_map;
     //Note: address map has actual addresses mapped SIMPLE to SML
-    int stack_size = 0; //Number of stack memory locations necessary
+    int stack_size = 0; //Number of stack memory locations necessary as S##
     int program_size = 0; //SML physical position of last command + 1
 };
 
