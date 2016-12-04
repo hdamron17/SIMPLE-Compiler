@@ -201,23 +201,15 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
               	cerr << "Command \"" << line[1] << "\" invalid."<<endl;
               	exit(EXIT_FAILURE);
             }
-        } else {
-            try {
-                int linenum = stoi(line.at(0));
-              	if(linenum>99 or linenum<0) {
-                    cerr<<"Program too large on line.\nToo few Arguments. Line: " << linenum<<endl;
-                    exit(EXIT_FAILURE);
-                }
-                address_map.insert({linenum, program_size});
-            } catch(out_of_range& e) {
-                //TODO error checking ... Brennan
-            } catch(invalid_argument& e) {
-                cerr<<"Invalid line number after " << line[0] << ". Too few arguements."<<endl;
-                exit(EXIT_FAILURE);
-            } catch(exception e) {
-              	cerr<<"Line number too large after " << line[0] << ". Too few arguements."<<endl;
-                exit(EXIT_FAILURE);
-            }
+        } 
+        else if(line.size() == 0)
+        {
+            //Do nothing on empty line
+        }
+      	else //line is invalid
+        {
+            cerr << "Invalid line " << line.at(0) << endl;
+            exit(EXIT_FAILURE);
         }
     }
     return sml_stream.str();
@@ -412,12 +404,17 @@ string compiler::_if(vector<string> *cmd)
         } 
       	else //the relop was not specified or specified incorrectly, thus we DIE (like hunter will if he keeps doing todos)
         {
+            //TODO put legitimate warning message
             cerr << "Relop issues on line " << cmd->at(0) << ". I had to kill myself because of YOU!"<<endl;
-          	exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
         return sml.str();
-    } else {
-        //TODO error on invalid number of argments
+    } 
+    else 
+    {
+        //TODO put legitimate warning message
+        cerr << "Relop issues on line " << cmd->at(0) << ". I had to kill myself because of YOU!"<<endl;
+        exit(EXIT_FAILURE);
     }
 }
 
