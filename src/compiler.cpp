@@ -12,65 +12,63 @@
 #include <stack>
 #include <sstream>
 #include <exception>
-#include "compiler.h"
-
-//TODO remove unnecessary imports
 #include <iostream>
+#include "compiler.h"
 
 using namespace std;
 
 static const string ALPHA = "abcdefghijklmnopqrstuvwxyz";
 
 /**
- * 	Takes two file names, create input/out put streams, calls hidden constructor, closes streams
- *
- *	@param infile Input file name
- *	@param outfile Output file name
- *
- *	@return void
-*/
+ * Takes two file names, create input/out put streams, calls hidden constructor, closes streams
+ * 
+ * @param infile Input file name
+ * @param outfile Output file name
+ * 
+ * @return void
+ */
 void compiler::compile(string infile, string outfile) 
 {
-  	//open streams from filenames
+    //open streams from filenames
     ifstream* in = new ifstream(infile, ios::in);
     ofstream* out = new ofstream(outfile,ios::out);
   
-  	//call compiler
+    //call compiler
     compile(in, out);
   
-  	//close stream and delete
+    //close stream and delete
     out->close();
     delete in;
     delete out;
 }
 
 /**
- * 	Takes input stream, runs through the interpreter, outputs to out
+ * Takes input stream, runs through the interpreter, outputs to out
  *
- *	@param *in Input stream
- *	@param *out Output stream
+ * @param *in Input stream
+ * @param *out Output stream
  *
- *	@return void
-*/
+ * @return void
+ */
 void compiler::compile(istream *in, ostream *out) 
 {
-  	//create the compiler as an object
+    //create the compiler as an object
     compiler cpl;
   	
-  	//compile and save to string
+    //compile and save to string
     string sml = cpl.get_sml(in);
   	
-  	//push to out
+    //push to out
     (*out) << sml;
 }
 
 /**
- *	Takes an input stream and calls both parses on it converting to SML
+ * Takes an input stream and calls both parses on it converting to SML
  *
- *	@param *in Input Stream
+ * @param *in Input Stream
  *
- *	@return SML code as a string
-*/
+ * @return SML code as a string
+ */
 string compiler::get_sml(istream *in)
 {
     vector<vector<string>> input = parse(in);
@@ -98,10 +96,10 @@ compiler::~compiler() {}
  */
 vector<vector<string>> compiler::parse(istream *input) 
 {
-  	//declare return variable
+    //declare return variable
     vector<vector<string>> parsed;
   
-  	//for each line
+    //for each line
     while(!input->eof())
     {
         string in;
@@ -128,7 +126,7 @@ vector<vector<string>> compiler::parse(istream *input)
 string compiler::make_sml(vector<vector<string>> *simple_code) 
 {
     stringstream sml_stream;
-  	//go through each line of the program
+    //go through each line of the program
     for(vector<string> line : (*simple_code) ) 
     {
       	//If the line is valid
@@ -139,30 +137,30 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
                 int linenum = stoi(line[0]);
               	if(linenum>99 or linenum<0) 
                 {
-                	cerr<<"Program too large on line " << linenum<<endl;
-                  	exit(EXIT_FAILURE);
+                    cerr<<"Program too large on line " << linenum<<endl;
+                    exit(EXIT_FAILURE);
                 }
                 address_map.insert({linenum, program_size});
             } 
-          	catch(invalid_argument& e) //bad linenum
+            catch(invalid_argument& e) //bad linenum
             {
                 cerr<<"Invalid line number " <<line[0]<<endl;
                 exit(EXIT_FAILURE);
             } 
-          	catch(exception e)//even worse linenum
+            catch(exception e)//even worse linenum
             {
               	cerr<<"Line number too large at "<< line[0] << endl;
                 exit(EXIT_FAILURE);
             }
-          
-          	//get the basic command
+            
+            //get the basic command
             string command = line[1];
             if(command == "rem") // rem
             {
                 sml_stream << "; ";
                 for(int i =2; i<line.size(); i++)
                 {
-              		sml_stream << line[i] << " ";
+                    sml_stream << line[i] << " ";
                 }
               	sml_stream << endl;
             } 
@@ -224,7 +222,7 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
  */
 string compiler::input(vector<string> *cmd) 
 {
-  	//Check that the line is the correct length for a input "# input id"
+    //Check that the line is the correct length for a input "# input id"
     if(cmd->size() == 3) 
     {
       	//get the id
@@ -238,7 +236,7 @@ string compiler::input(vector<string> *cmd)
       	else //if not a valid id
         {
             cerr << "Invalid id name \"" << var << " on line " << cmd->at(0) << endl;
-          	exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
       
         stringstream sml;
@@ -246,7 +244,7 @@ string compiler::input(vector<string> *cmd)
         sml << "10" << var << endl;
         return sml.str();
     } 
-  	else //invalid command
+    else //invalid command
     {
         cerr<<"Invalid argument to input on line " << cmd->at(0)<<endl;
       	exit(EXIT_FAILURE);
@@ -262,7 +260,7 @@ string compiler::input(vector<string> *cmd)
  */
 string compiler::output(vector<string> *cmd) 
 {
-  	//Check if valid command length
+    //Check if valid command length
     if(cmd->size() == 3) 
     {
       	//get the id to output
@@ -276,7 +274,7 @@ string compiler::output(vector<string> *cmd)
       	else //if not a valid id
         {
             cerr<<"Invalid variable \"" << var << "\" on line " << cmd->at(0)<<endl;
-      		exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
       
       	//create the sml for the output
@@ -284,7 +282,7 @@ string compiler::output(vector<string> *cmd)
         sml << "11" << var << endl;
         return sml.str();
     } 
-  	else //BAD JUJU
+    else //BAD JUJU
     {
         cerr<<"Invalid command format on line " << cmd->at(0)<<endl;
         exit(EXIT_FAILURE);
@@ -297,10 +295,10 @@ string compiler::output(vector<string> *cmd)
  * @param cmd Tokenized SIMPLE output command (<linenum> output <var>)
  *
  * @return Returs full SML string (always a single line for output command)
-*/
+ */
 string compiler::_if(vector<string> *cmd) 
 {
-  	//check that the comman is in a valid format
+    //check that the comman is in a valid format
     if(cmd->size()==7)
     {
       	//Get id1
@@ -312,7 +310,7 @@ string compiler::_if(vector<string> *cmd)
       	else //If not valid, die
         {
             cerr<<"Invalid variable \"" << id1 << "\" on line " << cmd->at(0)<<endl;
-      		exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
       
       	//get id2
@@ -324,7 +322,7 @@ string compiler::_if(vector<string> *cmd)
       	else //if not valid, die
         {
             cerr<<"Invalid variable \"" << id2 << "\" on line " << cmd->at(0)<<endl;
-      		exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
       
       	//get the address
@@ -341,13 +339,13 @@ string compiler::_if(vector<string> *cmd)
       	catch(invalid_argument& e) //bad address, die
         {
             cerr<<"Invalid goto address on line " << cmd->at(0)<<endl;
-      		exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
         addresses.insert(address);
         
       	/*
-         *Add ye ol sml to the code and increment the program size
-        */
+         *Add ye ol' sml to the code and increment the program size
+         */
         stringstream sml;
         string relop = cmd->at(3); // get the relop from the line
       
@@ -356,7 +354,7 @@ string compiler::_if(vector<string> *cmd)
          * This is a bunch of if statements for each relop
          * the SML is similar but loads the ids in different
          * order and uses different branching
-        */
+         */
         if(relop == "==") 
         {
             sml << "10" << id1 << endl;
@@ -424,10 +422,10 @@ string compiler::_if(vector<string> *cmd)
  * @param cmd the pointer ot the line of a comand
  *
  * @return sml as a string
-*/
+ */
 string compiler::_goto(vector<string> *cmd) 
 {
-  	if(cmd->size() == 3) //check that the size of the command ifs valid
+    if(cmd->size() == 3) //check that the size of the command ifs valid
     {
       	int linenum;
       	try //attempt to get ye ol lien num
@@ -435,15 +433,15 @@ string compiler::_goto(vector<string> *cmd)
             linenum = stoi(cmd->at(2));
             if(linenum>99 or linenum<0) //out pof bounds line number
             {
-          		cerr<<"Line pointer out of bounds on line " << cmd->at(0)<<endl;
-      			exit(EXIT_FAILURE);
+                cerr<<"Line pointer out of bounds on line " << cmd->at(0)<<endl;
+                exit(EXIT_FAILURE);
             }
             addresses.insert(linenum);
         } 
       	catch(invalid_argument& e) // bad linenum
         {
             cerr<<"Invalid line number on line " << cmd->at(0)<<endl;
-      		exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
       
       	//save the command to sml
@@ -452,7 +450,7 @@ string compiler::_goto(vector<string> *cmd)
       	string ret = sml.str();
         return ret;
     } 
-  	else //illegal number of arguments to the thingy
+    else //illegal number of arguments to the thingy
     {
       	cerr<<"Invalid number of arguments on line " << cmd->at(0)<<endl;
         exit(EXIT_FAILURE);
@@ -542,26 +540,6 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
  * @param partial_sml SML code containing variable names
  * @return Returns complete SML code with all variable names replaced
  */
-/**
- * Pseudocode algorithm
- * -check that 'program_size' + 'stack_size' + size('vars') + size('constants') <= 100
- * -for each value in 'addresses':
- * 		-look up sml equivalent in 'address_map'
- * 		-search and replace "a(simple address)" to "(sml address)"
- * 			-i.e. SIMPLE 40 maps to SML 8 so replace "a40" with "08"
- * -for each value in 'constants':
- * 		-search and replace "c(constant)" to "(program_size)"
- * 		-append the constant value with four digits using leading zeros to new line in the SML output
- * 		-incrememnt the 'program_size'
- * -for loop incrementing from 0 to 'stack_size' (index value is called 'i' here):
- * 		-search and replace "s(i)" to "(program_size)"
- * 		-append "0000" to new line in SML output
- * 		-incrememnt the 'program_size'
- * -for each value in 'vars':
- * 		-search and replace "(var)" to "(program_size)"
- * 		-incrememnt 'program_size'
- * -return modified string with true SML output
- */
 string compiler::second_parse(string partial_sml) {
     if(program_size + stack_size + vars.size() + constants.size() > 100) {
         //TODO throw errors here
@@ -573,12 +551,12 @@ string compiler::second_parse(string partial_sml) {
             string newstr = fmt(to_string(replace), 2, '0');
             partial_sml = replace_all(partial_sml, "A" + to_string(*iter), newstr);
         } catch (exception e) {
-          	cerr << "Out of range exception thrown due to invalid reference to position in array (add="<<&iter<<"). DUMP FOLLOWS: "<<endl;
-          	for(auto i : addresses)
+            cerr << "Out of range exception thrown due to invalid reference to position in array (add="<<&iter<<"). DUMP FOLLOWS: "<<endl;
+            for(auto i : addresses)
             {
             	cerr << i<<endl;
             }
-          	exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
         }
     }
     
@@ -597,7 +575,7 @@ string compiler::second_parse(string partial_sml) {
         program_size++; 
     }
     
-	//Replace stack variables
+    //Replace stack variables
     for(string var : vars) {
         string newstr = fmt(to_string(program_size), 2, '0');
         partial_sml = replace_all(partial_sml, var, newstr) + "0000\n"; // TODO remove added zeros
@@ -608,12 +586,14 @@ string compiler::second_parse(string partial_sml) {
 }
 
 /**
+ * Replaces all instances of the old string to the new string in str
  * 
- *
- *
- *
- *
-*/
+ * @param str String in which replacements will be made
+ * @param oldstr String to be replaced
+ * @param newstr String to be put in place of oldstr
+ * 
+ * @return Returns str but with replacements made
+ */
 string compiler::replace_all(string str, string oldstr, string newstr) 
 {
     int oldsize = oldstr.size();
@@ -652,35 +632,35 @@ string compiler::fmt(string original, int size, char fill) {
 */
 int compiler::precedence(string op1, string op2)
 {
-	string t1="^";
-	string t2="*/";
-	string t3="+-";
-	if( (t1.find(op1)!=string::npos and t1.find(op2)!=string::npos) or \
-		(t2.find(op1)!=string::npos and t2.find(op2)!=string::npos) or \
-		(t3.find(op1)!=string::npos and t3.find(op2)!=string::npos))
-	{
-		return 0;
-	}
-	else if(t1.find(op1)!=string::npos)
-	{
-		return 1;
-	}
-	else if(t1.find(op2)!=string::npos)
-	{
-		return -1;
-	}
-	else if(t2.find(op1)!=string::npos)
-	{
-		return 1;
-	}
-	else if(t2.find(op2)!=string::npos)
-	{
-		return -1;
-	}
-	else
-	{
-		return 1;
-	}
+    string t1="^";
+    string t2="*/";
+    string t3="+-";
+    if( (t1.find(op1)!=string::npos and t1.find(op2)!=string::npos) or \
+            (t2.find(op1)!=string::npos and t2.find(op2)!=string::npos) or \
+            (t3.find(op1)!=string::npos and t3.find(op2)!=string::npos))
+    {
+        return 0;
+    }
+    else if(t1.find(op1)!=string::npos)
+    {
+        return 1;
+    }
+    else if(t1.find(op2)!=string::npos)
+    {
+        return -1;
+    }
+    else if(t2.find(op1)!=string::npos)
+    {
+        return 1;
+    }
+    else if(t2.find(op2)!=string::npos)
+    {
+        return -1;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 /**
@@ -691,62 +671,62 @@ int compiler::precedence(string op1, string op2)
 */
 vector<string> compiler::to_postfix(vector<string> infix) 
 {
-	string operators="-*/+()";
-	vector<string> post;
-	stack<string> ops;
-	for(auto i : infix)
-	{
-		if(operators.find(i)==string::npos)//If a constant
-		{
-			post.push_back(i);
-		}
-		else if(ops.empty())//If the op stack is empty, add the op
-		{
-			ops.push(i);
-		}
-		else if(ops.top()=="(" or i=="(")//If the new op or top op are left paren, add new op
-		{
-			ops.push(i);
-		}
-		else if(i==")")//If a right paren, pop ops until left paren
-		{
-			while(ops.top()!="(")
-			{
-				post.push_back(ops.top());
-				ops.pop();
-			}
-			ops.pop();
-		}
-		else if(precedence(i,ops.top())==1)//if new op has higher precedence, push it
-		{
-			ops.push(i);
-		}
-		else if(precedence(i,ops.top())==0)//if the new op has equal precedence, pop and push new
-		{
-			post.push_back(ops.top());
-			ops.pop();
-			ops.push(i);
-		}
-		else if(precedence(i,ops.top())==-1) //If new is lower, solve until new is equal or higher
-		{
-			while(precedence(i,ops.top())==-1)
-			{
-				post.push_back(ops.top());
-				ops.pop();
-				if(ops.empty())//Prevents segmentation faults
-				{
-					break;
-				}
-			}
-			ops.push(i);
-		}
-	}
-	while(!ops.empty())//Flush the rest of the ops
-	{
-		post.push_back(ops.top());
-		ops.pop();
-	}
-	return post;
+    string operators="-*/+()";
+    vector<string> post;
+    stack<string> ops;
+    for(auto i : infix)
+    {
+        if(operators.find(i)==string::npos)//If a constant
+        {
+            post.push_back(i);
+        }
+        else if(ops.empty())//If the op stack is empty, add the op
+        {
+            ops.push(i);
+        }
+        else if(ops.top()=="(" or i=="(")//If the new op or top op are left paren, add new op
+        {
+            ops.push(i);
+        }
+        else if(i==")")//If a right paren, pop ops until left paren
+        {
+            while(ops.top()!="(")
+            {
+                post.push_back(ops.top());
+                ops.pop();
+            }
+            ops.pop();
+        }
+        else if(precedence(i,ops.top())==1)//if new op has higher precedence, push it
+        {
+            ops.push(i);
+        }
+        else if(precedence(i,ops.top())==0)//if the new op has equal precedence, pop and push new
+        {
+            post.push_back(ops.top());
+            ops.pop();
+            ops.push(i);
+        }
+        else if(precedence(i,ops.top())==-1) //If new is lower, solve until new is equal or higher
+        {
+            while(precedence(i,ops.top())==-1)
+            {
+                post.push_back(ops.top());
+                ops.pop();
+                if(ops.empty())//Prevents segmentation faults
+                {
+                        break;
+                }
+            }
+            ops.push(i);
+        }
+    }
+    while(!ops.empty())//Flush the rest of the ops
+    {
+        post.push_back(ops.top());
+        ops.pop();
+    }
+    return post;
 }
 
 /**
@@ -774,4 +754,3 @@ vector<string> compiler::tokenize(string str, string delimiter)
     }
     return tokens;
 }
-
