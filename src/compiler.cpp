@@ -409,8 +409,11 @@ string compiler::_if(vector<string> *cmd)
             sml << "31" << id2 << endl;
             sml << "41A" << address<< endl;
             program_size += 3;
-        } else {
-            //TODO KILL SELF
+        } 
+      	else //the relop was not specified or specified incorrectly, thus we DIE (like hunter will if he keeps doing todos)
+        {
+            cerr << "Relop issues on line " << cmd->at(0) << ". I had to kill myself because of YOU!"<<endl;
+          	exit(EXIT_FAILURE);
         }
         return sml.str();
     } else {
