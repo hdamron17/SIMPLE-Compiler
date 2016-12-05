@@ -3,7 +3,6 @@
  * File:   src/compiler.cpp
  * Author: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
- * Algorithm from: http://csis.pace.edu/~wolf/CS122/infix-postfix.htm
  * Created on October 24, 2016, 10:08 AM
  */
 
@@ -402,7 +401,6 @@ string compiler::_if(vector<string> *cmd)
         } 
       	else //the relop was not specified or specified incorrectly, thus we DIE (like hunter will if he keeps doing todos)
         {
-            //TODO put legitimate warning message
             cerr << "Relop issues on line " << cmd->at(0) << ". I had to kill myself because of YOU!"<<endl;
             exit(EXIT_FAILURE);
         }
@@ -410,7 +408,6 @@ string compiler::_if(vector<string> *cmd)
     } 
     else 
     {
-        //TODO put legitimate warning message
         cerr << "Relop issues on line " << cmd->at(0) << ". I had to kill myself because of YOU!"<<endl;
         exit(EXIT_FAILURE);
     }
@@ -457,13 +454,22 @@ string compiler::_goto(vector<string> *cmd)
     }
 }
 
+
+/**
+ * Creates the SML for the let command
+ *
+ * @param *cmd pointer to the line with the let command
+ *
+ * @return tuple(sml code, size of command)
+*/
 tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
         string final_var = "";
         if(ALPHA.find(cmd->at(2)) != string::npos) {
             final_var = cmd->at(2);
         } else {
-            //TODO throw errors because variable is invalid
+            cerr << "Invalid variable on line " << cmd->at(0)<<endl;
+			exit(EXIT_FAILURE);
         }
         
         vector<string> infix(cmd->begin()+4, cmd->end()); //with only math part
@@ -479,7 +485,6 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         for(auto i = postfix.begin(); i < postfix.end(); i++) {
             string token = (*i);
             if(operators.find(token) != string::npos) { //pointing to operator
-                //TODO all of the operator stuff
                 string id2 = ids.top();
                 ids.pop();
                 string id1 = ids.top();
@@ -516,11 +521,11 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     try {
                         num = stoi(token);
                     } catch(invalid_argument& e) {
-                        //TODO error checking for invalid variable or literal
-                        cerr << "died\n"; //TODO remove
+                        cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
+						exit(EXIT_FAILURE);
                     } catch(out_of_range& e) {
-                        //TODO error checking for number too big
-                        cerr << "died\n"; //TODO remove
+                        cerr << "Big thing on line " <<cmd->at(0)<<endl;
+						exit(EXIT_FAILURE);
                     }
                     ids.push("C" + to_string(num));
                     constants.insert(num);
@@ -542,7 +547,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
  */
 string compiler::second_parse(string partial_sml) {
     if(program_size + stack_size + vars.size() + constants.size() > 100) {
-        //TODO throw errors here
+        cerr << "Program too large." << endl;
     }
     //Replace addresses
     for(auto iter = addresses.begin(); iter != addresses.end(); iter++) {
@@ -571,14 +576,14 @@ string compiler::second_parse(string partial_sml) {
     //Replace stack variables
     for(int i = 0; i < stack_size; i++) {
         string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, "S" + to_string(i), newstr) + "0000\n"; //TODO remove added zeros
+        partial_sml = replace_all(partial_sml, "S" + to_string(i), newstr) + "0000\n";
         program_size++; 
     }
     
     //Replace stack variables
     for(string var : vars) {
         string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, var, newstr) + "0000\n"; // TODO remove added zeros
+        partial_sml = replace_all(partial_sml, var, newstr) + "0000\n";
         program_size++;
     }
   
@@ -613,6 +618,15 @@ string compiler::replace_all(string str, string oldstr, string newstr)
     return ret.str();
 }
 
+/**
+ * Formats the string to output with leading zeroes
+ *
+ * @param original original string
+ * @param size how large the string should be at the end
+ * @param fill char to fill empty with
+ *
+ * @return string of string with leading zeroes
+*/
 string compiler::fmt(string original, int size, char fill) {
     int origsize = original.size();
     if(origsize < size) {
