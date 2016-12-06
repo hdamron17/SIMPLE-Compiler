@@ -172,7 +172,7 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
                     exit(EXIT_FAILURE);
                 }
                 address_map.insert({linenum, program_size});
-                line_tracker++;
+                line_tracker = linenum;
             } 
             catch(invalid_argument& e) //bad linenum
             {
