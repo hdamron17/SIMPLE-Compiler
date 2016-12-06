@@ -1,0 +1,5 @@
+TODO
+====
+
+* let command with only one argument
+* track declared variables (by let or input) and ensure that none are undeclared
