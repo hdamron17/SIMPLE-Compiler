@@ -197,37 +197,37 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
 //                }
 //              	sml_stream << endl;
             } 
-          	else if(command == "input") //input
+            else if(command == "input") //input
             {
                 sml_stream << input(&line);
                 program_size++;
             } 
-          	else if(command == "print") //print
+            else if(command == "print") //print
             {
                 sml_stream << output(&line);
                 program_size++;
             } 
-          	else if(command == "goto") //goto
+            else if(command == "goto") //goto
             {
                 sml_stream << _goto(&line);
                 program_size++;
             } 
-          	else if(command == "if") // if
+            else if(command == "if") // if
             {
               	sml_stream << _if(&line);
             } 
-          	else if(command == "let") // let
+            else if(command == "let") // let
             {
           	tuple<string,int> cmd = let(&line);
                 sml_stream << get<0>(cmd);
                 program_size += get<1>(cmd);
             } 
-          	else if(command == "end") //DIE!!! (actually finish nicely)
+            else if(command == "end") //DIE!!! (actually finish nicely)
             {
                 sml_stream << "4300\n";
                 program_size++;
             } 
-          	else //invalid command
+            else //invalid command
             {
               	cerr << "Command \"" << line[1] << "\" invalid."<<endl;
               	exit(EXIT_FAILURE);
@@ -265,7 +265,7 @@ string compiler::input(vector<string> *cmd)
         if(ALPHA.find(var) != string::npos) 
         {
             vars.insert(var);
-        } 
+        }
       	else //if not a valid id
         {
             cerr << "Invalid id \"" << var << "\" on line " << cmd->at(0) << endl;
