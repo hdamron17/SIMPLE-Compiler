@@ -1,8 +1,6 @@
 ##### Project files
 build/
 dist/
-docs/
-nbproject/
 
 ##### C++ Object Files
 *.o

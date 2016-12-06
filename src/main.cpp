@@ -9,13 +9,13 @@ using namespace std;
 int main(int argc, char** argv) {
     if(argc == 2)
     {
-    	compiler::compile(argv[1], "a.out");
+    	compiler::compile(argv[1], "out.sml");
     }
     else if(argc == 3)
     {
         compiler::compile(argv[1], argv[2]);
     }
-  	else
+    else
     {
         cerr << "You must provide a SIMPLE source file\n";
     }

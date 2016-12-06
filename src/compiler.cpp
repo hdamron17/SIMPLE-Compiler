@@ -31,10 +31,20 @@ void compiler::compile(string infile, string outfile)
     //open streams from filenames
     ifstream* in = new ifstream(infile, ios::in);
     ofstream* out = new ofstream(outfile,ios::out);
-  
+    if(!(*in))
+    {
+        cerr << "Invalid input file\n";
+        exit(EXIT_FAILURE);
+    }
+    if(!(*out))
+    {
+        cerr << "Invalid output file\n";
+        exit(EXIT_FAILURE);
+    }
+    
     //call compiler
     compile(in, out);
-  
+
     //close stream and delete
     out->close();
     delete in;
@@ -53,10 +63,8 @@ void compiler::compile(istream *in, ostream *out)
 {
     //create the compiler as an object
     compiler cpl;
-  	
     //compile and save to string
     string sml = cpl.get_sml(in);
-  	
     //push to out
     (*out) << sml;
 }
@@ -97,20 +105,19 @@ vector<vector<string>> compiler::parse(istream *input)
 {
     //declare return variable
     vector<vector<string>> parsed;
-  
     //for each line
     while(!input->eof())
     {
         string in;
-      
+        
       	//Get the line
         getline((*input),in);
-      
       	//split and save to a vector
         vector<string> line = tokenize(in," ");
       
       	//push the vector to the return variable
         parsed.push_back(line);
+        
     }
     return parsed;
 }
@@ -476,63 +483,95 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         vector<string> postfix = to_postfix(infix); //math part to postfix
         
         stringstream sml;
-	string operators="+-/*";
+	    string operators="+-/*"; /**/
         stack<string> ids;
         int let_size = 0;
         int local_stack = 0;
         //TODO check if there is only one token and store that to the final var
         //TODO check if size of postfix is 2 because that is wrong
-        for(auto i = postfix.begin(); i < postfix.end(); i++) {
-            string token = (*i);
-            if(operators.find(token) != string::npos) { //pointing to operator
-                string id2 = ids.top();
-                ids.pop();
-                string id1 = ids.top();
-                ids.pop();
-                if(id1[0] == 'S') //if it starts with S, it's popped off stack
-                    local_stack--;
-                if(id2[0] == 'S') //if it starts with S, it's popped off stack
-                    local_stack--;
-                int operation = 30 + operators.find(token);
-                //uses position plus 30 to convert to SML opcode
-                sml << "20" << id1 << endl //loads id1 into accumulator
-                    << operation << id2 << endl; //applies operator on acc with id2 param
-                if(i + 1 == postfix.end()) //last operator so save to final var
-                {
-                    sml << 21 << final_var << endl; //store to final var
+        if(cmd->size() == 5) //only one value (i.e. "10 let x = 9" )
+        {
+            stringstream sml;
+            string final_var = cmd->at(2); //final variable to hold value
+            string token = cmd->at(4); //value to be stored in final var
+            if(ALPHA.find(token) != string::npos) { //valid variable
+                sml << "20" << token << endl; //load variable into acc for moving
+                vars.insert(token); //add variable to vars list
+            } else { // now it may be a literal but we'll see about that
+                int num = 0;
+                try {
+                    num = stoi(token); 
+                } catch(invalid_argument& e) {
+                    cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
+	    			exit(EXIT_FAILURE);
+                } catch(out_of_range& e) {
+                    cerr << "Big thing on line " <<cmd->at(0)<<endl;
+	    			exit(EXIT_FAILURE);
                 }
-                else
-                {
-                    sml << 21 << "S" << local_stack << endl; //else store to stack
-                    ids.push("S" + to_string(local_stack)); //push the s to local stack
-                    local_stack++; //makes stack 1 larger
-                }
-                
-                let_size += 3; //each operator uses 3 SML ops
-                
-                if(local_stack + 1 > stack_size) //this requires more stack
-                    stack_size = local_stack;
-            } else { //hopefully pointing to constant or variable
-                if(ALPHA.find(token) != string::npos) { //valid variable
-                    ids.push(token);
-                    vars.insert(token);
-                } else { // now it may be a literal but we'll see about that
-                    int num = 0;
-                    try {
-                        num = stoi(token);
-                    } catch(invalid_argument& e) {
-                        cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
-						exit(EXIT_FAILURE);
-                    } catch(out_of_range& e) {
-                        cerr << "Big thing on line " <<cmd->at(0)<<endl;
-						exit(EXIT_FAILURE);
+                sml << "20C" << to_string(num) << endl; //load constant to acc for moving
+                constants.insert(num); //add constant to constants list
+            }
+            sml << "21" << final_var << endl;
+        }
+        else if(cmd->size() == 6)
+        {
+            cerr << "Invalid let command on line " <<cmd->at(0)<<endl;
+		    exit(EXIT_FAILURE);
+        }
+        else
+        {
+            for(auto i = postfix.begin(); i < postfix.end(); i++) {
+                string token = (*i);
+                if(operators.find(token) != string::npos) { //pointing to operator
+                    string id2 = ids.top();
+                    ids.pop();
+                    string id1 = ids.top();
+                    ids.pop();
+                    if(id1[0] == 'S') //if it starts with S, it's popped off stack
+                        local_stack--;
+                    if(id2[0] == 'S') //if it starts with S, it's popped off stack
+                        local_stack--;
+                    int operation = 30 + operators.find(token);
+                    //uses position plus 30 to convert to SML opcode
+                    sml << "20" << id1 << endl //loads id1 into accumulator
+                        << operation << id2 << endl; //applies operator on acc with id2 param
+                    if(i + 1 == postfix.end()) //last operator so save to final var
+                    {
+                        sml << 21 << final_var << endl; //store to final var
                     }
-                    ids.push("C" + to_string(num));
-                    constants.insert(num);
+                    else
+                    {
+                        sml << 21 << "S" << local_stack << endl; //else store to stack
+                        ids.push("S" + to_string(local_stack)); //push the s to local stack
+                        local_stack++; //makes stack 1 larger
+                    }
+                    
+                    let_size += 3; //each operator uses 3 SML ops
+                    
+                    if(local_stack + 1 > stack_size) //this requires more stack
+                        stack_size = local_stack;
+                } else { //hopefully pointing to constant or variable
+                    if(ALPHA.find(token) != string::npos) { //valid variable
+                        ids.push(token);
+                        vars.insert(token);
+                    } else { // now it may be a literal but we'll see about that
+                        int num = 0;
+                        try {
+                            num = stoi(token);
+                        } catch(invalid_argument& e) {
+                            cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
+			    			exit(EXIT_FAILURE);
+                        } catch(out_of_range& e) {
+                            cerr << "Big thing on line " <<cmd->at(0)<<endl;
+			    			exit(EXIT_FAILURE);
+                        }
+                        ids.push("C" + to_string(num));
+                        constants.insert(num);
+                    }
                 }
             }
+            return make_tuple(sml.str(), let_size);
         }
-        return make_tuple(sml.str(), let_size);
     } else {
       	cerr << "Invalid command format on line "<<cmd->at(0)<<endl;
       	exit(EXIT_FAILURE);
