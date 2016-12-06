@@ -163,12 +163,13 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
             string command = line[1];
             if(command == "rem") // rem
             {
-                sml_stream << "; ";
-                for(int i =2; i<line.size(); i++)
-                {
-                    sml_stream << line[i] << " ";
-                }
-              	sml_stream << endl;
+                //rem ; may be extended on future versions of interpreter
+//                sml_stream << "; ";
+//                for(int i =2; i<line.size(); i++)
+//                {
+//                    sml_stream << line[i] << " ";
+//                }
+//              	sml_stream << endl;
             } 
           	else if(command == "input") //input
             {
@@ -241,7 +242,7 @@ string compiler::input(vector<string> *cmd)
         } 
       	else //if not a valid id
         {
-            cerr << "Invalid id name \"" << var << " on line " << cmd->at(0) << endl;
+            cerr << "Invalid id \"" << var << "\" on line " << cmd->at(0) << endl;
             exit(EXIT_FAILURE);
         }
       
