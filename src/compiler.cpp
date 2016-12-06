@@ -364,7 +364,7 @@ string compiler::_if(vector<string> *cmd)
          */
         if(relop == "==") 
         {
-            sml << "10" << id1 << endl;
+            sml << "20" << id1 << endl;
             sml << "31" << id2 << endl;
             sml << "42A" << address << endl;
             program_size += 3;
