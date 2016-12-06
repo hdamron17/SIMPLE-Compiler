@@ -12,6 +12,7 @@
 #include <sstream>
 #include <exception>
 #include <iostream>
+#include <limits.h>
 #include "compiler.h"
 
 using namespace std;
@@ -120,7 +121,7 @@ vector<vector<string>> compiler::parse(istream *input)
         getline((*input),in);
         
         //fix annoying line encoding issue
-        if(in[in.size()-1] == '\r') 
+        if(in[in.size()-1] == '\r')
         {
             in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
         }
@@ -145,6 +146,7 @@ vector<vector<string>> compiler::parse(istream *input)
 string compiler::make_sml(vector<vector<string>> *simple_code) 
 {
     stringstream sml_stream;
+    int line_tracker = -1; //keeps track of line numbers to maintain increasing order
     //go through each line of the program
     for(vector<string> line : (*simple_code) ) 
     {
@@ -153,17 +155,28 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
         {
             try //convert linenum as a string to a int
             {
-                int linenum = stoi(line[0]);
+                int linenum = manual_stoi(line[0]);
               	if(linenum>99 or linenum<0) 
                 {
-                    cerr<<"Program too large on line " << linenum<<endl;
+                    cerr<< "Program too large on line " << linenum << endl;
+                    exit(EXIT_FAILURE);
+                }
+                if(linenum <= line_tracker) 
+                {
+                    cerr << "Line number out of order at line " << linenum << endl;
+                    exit(EXIT_FAILURE);
+                }
+                if(address_map.count(linenum) > 0)
+                {
+                    cerr << "Duplicate line number " << linenum << endl;
                     exit(EXIT_FAILURE);
                 }
                 address_map.insert({linenum, program_size});
+                line_tracker++;
             } 
             catch(invalid_argument& e) //bad linenum
             {
-                cerr<<"Invalid line number " <<line[0]<<endl;
+                cerr<<"Invalid line number " << line[0]<<endl;
                 exit(EXIT_FAILURE);
             } 
             catch(exception e)//even worse linenum
@@ -349,7 +362,7 @@ string compiler::_if(vector<string> *cmd)
       	int address;
       	try //get address if valid
         {
-            address = stoi(cmd->at(6));
+            address = manual_stoi(cmd->at(6));
             if(address>99 or address<0)//address out of bounds, die
             {
                 cerr<<"Goto address out of bounds " << cmd->at(0)<<endl;
@@ -448,8 +461,8 @@ string compiler::_goto(vector<string> *cmd)
       	int linenum;
       	try //attempt to get ye ol lien num
         {
-            linenum = stoi(cmd->at(2));
-            if(linenum>99 or linenum<0) //out pof bounds line number
+            linenum = manual_stoi(cmd->at(2));
+            if(linenum>99 or linenum<0) //out of bounds line number
             {
                 cerr<<"Line pointer out of bounds on line " << cmd->at(0)<<endl;
                 exit(EXIT_FAILURE);
@@ -514,7 +527,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
             } else { // now it may be a literal but we'll see about that
                 int num = 0;
                 try {
-                    num = stoi(token); 
+                    num = manual_stoi(token); 
                 } catch(invalid_argument& e) {
                     cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
 	    			exit(EXIT_FAILURE);
@@ -571,7 +584,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     } else { // now it may be a literal but we'll see about that
                         int num = 0;
                         try {
-                            num = stoi(token);
+                            num = manual_stoi(token);
                         } catch(invalid_argument& e) {
                             cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
 			    			exit(EXIT_FAILURE);
@@ -820,4 +833,40 @@ vector<string> compiler::tokenize(string str, string delimiter)
         start = end + delimiter.size();
     }
     return tokens;
+}
+
+int compiler::manual_stoi(string str)
+{
+    bool negative = false; //true if str starts with negative sign
+    int value = 0; //value parsed
+    bool first = true; //true if first instance
+    for(char i : str)
+    {
+        if(first && str[0] == '-') 
+        {
+            negative = false;
+        }
+        else 
+        {
+            int digit = ((int)i) - 48; //Subtract 30 hex to be 0 - 10 if number
+            if(digit >= 0 && digit < 10) 
+            {
+                if(value > INT_MAX / 10) //multiplying by 10 will overflow
+                    throw out_of_range("Number too big");
+                value *= 10; //go up by power of 10
+                
+                if(value > INT_MAX - digit) //adding digit will overflow
+                    throw out_of_range("Number too big");
+                value += digit; //add digit
+            } 
+            else
+            {
+                throw invalid_argument("Invalid character " + i);
+            }
+        }
+        first = false;
+    }
+    if(negative)
+        value = -value;
+    return value;
 }
