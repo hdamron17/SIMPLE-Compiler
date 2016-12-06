@@ -28,45 +28,48 @@ static const string ALPHA = "abcdefghijklmnopqrstuvwxyz";
  */
 void compiler::compile(string infile, string outfile) 
 {
-    //open streams from filenames
+    //open istream from infile
     ifstream* in = new ifstream(infile, ios::in);
-    ofstream* out = new ofstream(outfile,ios::out);
     if(!(*in))
     {
         cerr << "Invalid input file\n";
         exit(EXIT_FAILURE);
     }
+    
+    //call compiler
+    compile(in);
+    
+    //delete input stream
+    delete in;
+
+    //open ostream from ofile
+    ofstream* out = new ofstream(outfile,ios::out);
     if(!(*out))
     {
         cerr << "Invalid output file\n";
         exit(EXIT_FAILURE);
     }
     
-    //call compiler
-    compile(in, out);
-
-    //close stream and delete
+    //close output stream and delete
     out->close();
-    delete in;
     delete out;
 }
 
 /**
- * Takes input stream, runs through the interpreter, outputs to out
+ * Takes input stream, runs through the interpreter, and returns SML string
  *
  * @param *in Input stream
- * @param *out Output stream
  *
- * @return void
+ * @return Returns a string containing complete SML code
  */
-void compiler::compile(istream *in, ostream *out) 
+string compiler::compile(istream *in) 
 {
     //create the compiler as an object
     compiler cpl;
     //compile and save to string
     string sml = cpl.get_sml(in);
     //push to out
-    (*out) << sml;
+    return sml;
 }
 
 /**
