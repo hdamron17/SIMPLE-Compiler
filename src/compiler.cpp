@@ -37,7 +37,7 @@ void compiler::compile(string infile, string outfile)
     }
     
     //call compiler
-    compile(in);
+    string sml = compile(in);
     
     //delete input stream
     delete in;
@@ -49,6 +49,9 @@ void compiler::compile(string infile, string outfile)
         cerr << "Invalid output file\n";
         exit(EXIT_FAILURE);
     }
+    
+    //output to file
+    (*out) << sml;
     
     //close output stream and delete
     out->close();
@@ -115,6 +118,13 @@ vector<vector<string>> compiler::parse(istream *input)
         
       	//Get the line
         getline((*input),in);
+        
+        //fix annoying line encoding issue
+        if(in[in.size()-1] == '\r') 
+        {
+            in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
+        }
+        
       	//split and save to a vector
         vector<string> line = tokenize(in," ");
       
@@ -248,7 +258,7 @@ string compiler::input(vector<string> *cmd)
             cerr << "Invalid id \"" << var << "\" on line " << cmd->at(0) << endl;
             exit(EXIT_FAILURE);
         }
-      
+        
         stringstream sml;
       	//create the sml code
         sml << "10" << var << endl;
