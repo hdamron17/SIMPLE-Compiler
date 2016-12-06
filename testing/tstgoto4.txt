@@ -1,0 +1,9 @@
+10 rem program to test if variable == variable goto
+20 input x
+30 input y
+40 if x == y goto 80
+50 input z
+60 print z
+70 goto 90
+80 print x
+90 end

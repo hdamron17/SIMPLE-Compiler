@@ -1,0 +1,7 @@
+10 rem test "line number exists"
+2O rem used a letter O instead of number 0
+30 input x
+40 input y
+50 print x
+60 print y
+70 end

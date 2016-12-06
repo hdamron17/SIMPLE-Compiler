@@ -1,0 +1,6 @@
+10 rem program to test easy i/o commands
+20 input x
+30 input y
+40 print y
+50 print x
+60 end

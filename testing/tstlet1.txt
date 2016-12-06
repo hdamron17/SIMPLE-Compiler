@@ -1,0 +1,5 @@
+10 rem program to test simple let with literal
+20 input x
+40 let x = x + 5
+50 print x
+70 end

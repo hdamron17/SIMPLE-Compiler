@@ -1,0 +1,7 @@
+10 rem print literal
+20 rem  
+30 input x
+40 input y
+50 print x
+60 print 20 
+70 end

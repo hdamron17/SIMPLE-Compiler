@@ -1,0 +1,8 @@
+10 rem let with literal on right
+20 rem  
+30 input x
+40 input y
+50 print x
+60 let y = 20 + x
+65 print y 
+70 end

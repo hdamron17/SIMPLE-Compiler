@@ -1,0 +1,12 @@
+10 rem
+11 rem
+20 input x
+30 input y
+35 let z = 0
+37 let q = x
+40 let x = x * q
+50 let y = y - 1
+60 if y > z goto 40
+70 print x
+75 print y
+80 end

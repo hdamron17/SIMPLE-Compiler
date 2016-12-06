@@ -1,0 +1,7 @@
+10 rem program to test goto
+20 input x
+30 input y
+35 goto 50
+40 input y
+50 print x
+60 end

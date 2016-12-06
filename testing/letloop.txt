@@ -1,0 +1,12 @@
+5 rem get the number of integers to sum, adds them and displays total
+10 input x
+23 input y
+30 let s = y
+35 let z = 1
+40 if x == z goto 90
+50 input y
+60 let s = s + y
+70 let x = x - 1
+80 goto 40
+90 print s
+99 end

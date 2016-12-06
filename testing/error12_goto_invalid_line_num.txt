@@ -1,0 +1,7 @@
+10 rem goto invalid line num
+20 rem  
+30 input x
+40 input y
+50 print x
+60 goto 35 
+70 end

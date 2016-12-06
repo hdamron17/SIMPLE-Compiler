@@ -1,0 +1,7 @@
+5 rem let not enough operands
+30 input x
+40 input 5
+50 print x
+60 let 5 =  x * 5 
+65 print 5 
+70 end

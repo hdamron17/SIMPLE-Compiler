@@ -1,0 +1,8 @@
+10 rem if with no relational op
+20 rem  
+30 input x
+40 input y
+50 print x
+60 if x  y goto 20
+65 print y 
+70 end

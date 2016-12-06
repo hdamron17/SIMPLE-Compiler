@@ -1,0 +1,7 @@
+10 rem test duplicate line number  
+20 rem  
+30 input x
+30 input y
+50 print x
+60 print y
+70 end

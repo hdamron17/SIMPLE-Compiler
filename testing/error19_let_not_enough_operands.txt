@@ -1,0 +1,7 @@
+10 rem let not enough operands  
+30 input x
+40 input y
+50 print x
+60 let z =  x * y + 
+65 print y 
+70 end

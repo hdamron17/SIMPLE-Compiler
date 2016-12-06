@@ -1,0 +1,8 @@
+10 rem let with nondeclared right side
+20 rem  
+30 input x
+40 input y
+50 print x
+60 let y = u + x
+65 print y 
+70 end
