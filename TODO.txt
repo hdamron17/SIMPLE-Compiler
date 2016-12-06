@@ -1,5 +1,12 @@
 TODO
 ====
 
-* let command with only one argument
+* let command with only one argument (in lots)
 * track declared variables (by let or input) and ensure that none are undeclared
+    * (in 07, 12, 16)
+* (in error12) unhandled out_of_range exceptiond dumps
+* (in error18) postfix does not handle incorrect number of arguments
+* (in error19: "let_not_enough_operands") segmentation fault
+* (in several) input command adds to value instead of replacing; may be in interpreter
+* Unresolved sources of error: 07, 12, 16, 18, 19
+* Debatably not errors: 17
