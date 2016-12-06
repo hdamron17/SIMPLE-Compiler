@@ -9,16 +9,16 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
-CND_ARTIFACT_NAME_Debug=simple-compiler
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/simple-compiler
+CND_ARTIFACT_NAME_Debug=simplec
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/simplec
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
 CND_PACKAGE_NAME_Debug=simple-compiler.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/simple-compiler.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
-CND_ARTIFACT_NAME_Release=simple-compiler
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/simple-compiler
+CND_ARTIFACT_NAME_Release=simplec
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/simplec
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
 CND_PACKAGE_NAME_Release=simple-compiler.tar
 CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/simple-compiler.tar
