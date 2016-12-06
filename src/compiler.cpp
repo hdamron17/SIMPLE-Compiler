@@ -176,7 +176,7 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
                 sml_stream << input(&line);
                 program_size++;
             } 
-          	else if(command == "output") //output
+          	else if(command == "print") //print
             {
                 sml_stream << output(&line);
                 program_size++;
