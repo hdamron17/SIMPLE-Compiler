@@ -510,7 +510,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         vector<string> postfix = to_postfix(infix); //math part to postfix
         
         stringstream sml;
-	    string operators="+-/*"; /**/
+        string operators="+-/*"; /**/
         stack<string> ids;
         int let_size = 0;
         int local_stack = 0;
@@ -524,14 +524,21 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
             if(ALPHA.find(token) != string::npos) { //valid variable
                 sml << "20" << token << endl; //load variable into acc for moving
                 vars.insert(token); //add variable to vars list
-            } else { // now it may be a literal but we'll see about that
+            }
+            else // now it may be a literal but we'll see about that
+            { 
                 int num = 0;
-                try {
+                try 
+                {
                     num = manual_stoi(token); 
-                } catch(invalid_argument& e) {
+                } 
+                catch(invalid_argument& e) 
+                {
                     cerr << "Invalid Argument on line " <<cmd->at(0)<<endl;
 	    			exit(EXIT_FAILURE);
-                } catch(out_of_range& e) {
+                } 
+                catch(out_of_range& e) 
+                {
                     cerr << "Big thing on line " <<cmd->at(0)<<endl;
 	    			exit(EXIT_FAILURE);
                 }
@@ -542,8 +549,8 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         }
         else if(cmd->size() == 6)
         {
-            cerr << "Invalid let command on line " <<cmd->at(0)<<endl;
-		    exit(EXIT_FAILURE);
+            cerr << "Invalid number of parameters in let on line " <<cmd->at(0)<<endl;
+            exit(EXIT_FAILURE);
         }
         else
         {
@@ -835,6 +842,13 @@ vector<string> compiler::tokenize(string str, string delimiter)
     return tokens;
 }
 
+/**
+ * Does stoi but manually
+ * @param str String to be parsed to int
+ * @return Returns string as an int
+ * @throws Throws out_of_range if number is too big or small
+ * @throws Throws invalid_argument if str does not have valid number
+ */
 int compiler::manual_stoi(string str)
 {
     bool negative = false; //true if str starts with negative sign
