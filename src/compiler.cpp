@@ -647,7 +647,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     cerr << "Big thing on line " <<cmd->at(0)<<endl;
 	    			exit(EXIT_FAILURE);
                 }
-                sml << "20C" << to_string(num) << endl; //load constant to acc for moving
+                sml << "20C" << manual_to_string(num) << endl; //load constant to acc for moving
                 constants.insert(num); //add constant to constants list
             }
             sml << "21" << final_var << endl;
@@ -682,7 +682,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     else
                     {
                         sml << 21 << "S" << local_stack << endl; //else store to stack
-                        ids.push("S" + to_string(local_stack)); //push the s to local stack
+                        ids.push("S" + manual_to_string(local_stack)); //push the s to local stack
                         local_stack++; //makes stack 1 larger
                     }
                     
@@ -705,7 +705,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                             cerr << "Big thing on line " <<cmd->at(0)<<endl;
 			    			exit(EXIT_FAILURE);
                         }
-                        ids.push("C" + to_string(num));
+                        ids.push("C" + manual_to_string(num));
                         constants.insert(num);
                     }
                 }
@@ -733,8 +733,8 @@ string compiler::second_parse(string partial_sml) {
     for(auto iter = addresses.begin(); iter != addresses.end(); iter++) {
       	try {
             int replace = address_map.at(*iter);
-            string newstr = fmt(to_string(replace), 2, '0');
-            partial_sml = replace_all(partial_sml, "A" + to_string(*iter), newstr);
+            string newstr = fmt(manual_to_string(replace), 2, '0');
+            partial_sml = replace_all(partial_sml, "A" + manual_to_string(*iter), newstr);
         } catch (out_of_range& e) {
             cerr << "Invalid reference to line number " << *iter << endl;
             exit(EXIT_FAILURE);
@@ -743,16 +743,16 @@ string compiler::second_parse(string partial_sml) {
     
     //Replace constants
     for(auto iter = constants.begin(); iter != constants.end(); iter++) {
-        string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, "C" + to_string(*iter), newstr)
-                + fmt(to_string(*iter), 4, '0') + "\n";
+        string newstr = fmt(manual_to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, "C" + manual_to_string(*iter), newstr)
+                + fmt(manual_to_string(*iter), 4, '0') + "\n";
         program_size++;
     }
     
     //Replace stack variables
     for(int i = 0; i < stack_size; i++) {
-        string newstr = fmt(to_string(program_size), 2, '0');
-        partial_sml = replace_all(partial_sml, "S" + to_string(i), newstr) + "0000\n";
+        string newstr = fmt(manual_to_string(program_size), 2, '0');
+        partial_sml = replace_all(partial_sml, "S" + manual_to_string(i), newstr) + "0000\n";
         program_size++; 
     }
     
@@ -763,7 +763,7 @@ string compiler::second_parse(string partial_sml) {
             cerr << "Variable " << var << " is never initialized" << endl;
             exit(EXIT_FAILURE);
         }
-        string newstr = fmt(to_string(program_size), 2, '0');
+        string newstr = fmt(manual_to_string(program_size), 2, '0');
         partial_sml = replace_all(partial_sml, var, newstr) + "0000\n";
         program_size++;
     }
@@ -994,27 +994,25 @@ int compiler::manual_stoi(string str)
 }
 
 /**
- * Manual to_string(int) method
+ * Manual manual_to_string(int) method
  * @param num Number to be converted
  * @return Returns string representation
  */
 string compiler::manual_to_string(int num) {
     stringstream out;
-    if(num < 0) {
+    if(num < 0) 
+    {
         out << "-";
         num = -num;
     }
+    
     int power = 1;
-    cout<<num<<"->"<<power<<endl;
-    while(power < num) {
+    while(power < num) 
         power *= 10;
-        cout<<num<<"->"<<power<<endl;
-    }
-    while(power > 0) {
-        cout << "power = " << power << endl;
-        cout << "|" << (num % power) / (power / 10) << endl;
-        out << "|" << (num % power) / (power / 10);
-        cout<<"the stuff=" <<power/10<<endl;
+    
+    while(power > 1) 
+    {
+        out << (num % power) / (power / 10);
         power /= 10;
     }
     return out.str();
