@@ -123,15 +123,14 @@ vector<vector<string>> compiler::parse(istream *input)
         
         #if __linux__ || __APPLE__
             //fix annoying line encoding issue
-            if(in[in.size()-1] == '\r')
+            if(in.size() >= 1 && in[in.size()-1] == '\r')
             {
                 in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
             }
         #elif _WIN32
-            //fix on windoze
-            if(in.size() >= 2 && in[in.size()-2] == '\r' && in[in.size()-1] == '\n')
+            if(in.size() >= 2 && in[in.size()-2] != '\r' && in[in.size()-1] == '\n')
             {
-                in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
+                in.insert(in.size()-1, 1, "\r"); //insert \r before ending \n
             }
         #else
             #error Platform not supported
