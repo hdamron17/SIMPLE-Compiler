@@ -1,0 +1,5 @@
+10 input x
+20 let y = 9 + x / 2
+30 print y
+40 goto 50
+50 end

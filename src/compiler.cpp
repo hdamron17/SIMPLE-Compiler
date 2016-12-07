@@ -88,6 +88,7 @@ string compiler::get_sml(istream *in)
 {
     vector<vector<string>> input = parse(in);
     string pseudoSML = make_sml(&input);
+    cout << pseudoSML << endl; //TODO remove
     string realSML = second_parse(pseudoSML);
     return realSML;
 }
@@ -619,8 +620,6 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         stack<string> ids;
         int let_size = 0;
         int local_stack = 0;
-        //TODO check if there is only one token and store that to the final var
-        //TODO check if size of postfix is 2 because that is wrong
         if(cmd->size() == 5) //only one value (i.e. "10 let x = 9" )
         {
             stringstream sml;
@@ -1010,7 +1009,7 @@ string compiler::manual_to_string(int num) {
     }
     
     int power = 1;
-    while(power < num) 
+    while(power <= num) 
         power *= 10;
     
     while(power > 1) 
