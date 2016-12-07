@@ -161,9 +161,12 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
                     cerr<< "Program too large on line " << linenum << endl;
                     exit(EXIT_FAILURE);
                 }
-                if(linenum <= line_tracker) 
+                if(linenum < line_tracker) 
                 {
                     cerr << "Line number out of order at line " << linenum << endl;
+                    exit(EXIT_FAILURE);
+                } else if(linenum == line_tracker) {
+                    cerr << "Duplicate line number " << linenum << endl;
                     exit(EXIT_FAILURE);
                 }
                 if(address_map.count(linenum) > 0)
@@ -260,7 +263,8 @@ string compiler::input(vector<string> *cmd)
     {
       	//get the id
         string var = cmd->at(2);
-      
+        initialized_vars.insert(var); //add to initialized vars
+        
       	//check if id or constant
         if(ALPHA.find(var) != string::npos) 
         {
@@ -501,6 +505,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         string final_var = "";
         if(ALPHA.find(cmd->at(2)) != string::npos) {
             final_var = cmd->at(2); //final variable to hold value
+            initialized_vars.insert(final_var); //add final var to initialized vars
         }
         else
         {
@@ -624,18 +629,15 @@ string compiler::second_parse(string partial_sml) {
     if(program_size + stack_size + vars.size() + constants.size() > 100) {
         cerr << "Program too large." << endl;
     }
+    
     //Replace addresses
     for(auto iter = addresses.begin(); iter != addresses.end(); iter++) {
       	try {
             int replace = address_map.at(*iter);
             string newstr = fmt(to_string(replace), 2, '0');
             partial_sml = replace_all(partial_sml, "A" + to_string(*iter), newstr);
-        } catch (exception e) {
-            cerr << "Out of range exception thrown due to invalid reference to position in array (add="<<&iter<<"). DUMP FOLLOWS: "<<endl;
-            for(auto i : addresses)
-            {
-            	cerr << i<<endl;
-            }
+        } catch (out_of_range& e) {
+            cerr << "Invalid reference to line number " << *iter << endl;
             exit(EXIT_FAILURE);
         }
     }
@@ -655,8 +657,13 @@ string compiler::second_parse(string partial_sml) {
         program_size++; 
     }
     
-    //Replace stack variables
+    //Replace variables and check if initialized
     for(string var : vars) {
+        if(initialized_vars.find(var) == initialized_vars.end())
+        {
+            cerr << "Variable " << var << " is never initialized" << endl;
+            exit(EXIT_FAILURE);
+        }
         string newstr = fmt(to_string(program_size), 2, '0');
         partial_sml = replace_all(partial_sml, var, newstr) + "0000\n";
         program_size++;

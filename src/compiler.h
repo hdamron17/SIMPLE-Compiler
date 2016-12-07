@@ -34,11 +34,9 @@ private:
     std::vector<std::vector<std::string>> parse(std::istream*);
     std::string make_sml(std::vector<std::vector<std::string>>*);
     
-    //TODO figure out what we need to do for each command (function may only be necessary for let command)
     std::string input(std::vector<std::string>*);
     std::string output(std::vector<std::string>*);
     std::tuple<std::string,int> let(std::vector<std::string>*);
-    std::tuple<std::string,int> OLD_let(std::vector<std::string>*); //TODO remove
     std::string _goto(std::vector<std::string>*);
     std::string _if(std::vector<std::string>*);
     
@@ -46,13 +44,15 @@ private:
     
     int precedence(std::string, std::string); //TODO could be const but would not compile
     std::vector<std::string> to_postfix(std::vector<std::string>); //TODO same as above about const
-
+    
     std::vector<std::vector<std::string>> simple; //2D vector of simple code
-  
+    
     std::unordered_set<int> addresses; //Map of SIMPLE code addresses to SML addresses
     //Note: needed addresses are written in the form A42 for address 42
     std::unordered_set<std::string> vars;
     //Note: all vars are single letters in SIMPLE code, but others are allowed
+    std::unordered_set<std::string> initialized_vars;
+    //initialized vars must include all vars by the end
     std::unordered_set<int> constants;
     //Note: constants are written in the form A42 for number 42
     std::unordered_map<int,int> address_map;
