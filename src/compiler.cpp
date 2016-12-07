@@ -10,7 +10,6 @@
 #include <vector>
 #include <stack>
 #include <sstream>
-#include <exception>
 #include <iostream>
 #include <limits.h>
 #include "compiler.h"

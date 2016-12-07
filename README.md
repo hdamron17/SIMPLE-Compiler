@@ -1,2 +1,6 @@
-# SIMPLE-Compiler
-Compiler for SIMPLE (an example language) into SML
+SIMPLE-Compiler
+===============
+
+Compiler for SIMPLE (a BASIC dialect) into SML (an interpreted language similar to machine code). 
+
+
