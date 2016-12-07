@@ -26,7 +26,7 @@ public:
     static std::string manual_to_string(int num); //manual to_string
     static void compile(std::string, std::string); //compiles from one file into another
     static bool precheck(std::vector<std::string>); //prechecks postfix conversion
-//private: 
+private: 
     static std::string compile(std::istream*); //converter method makes a compiler instance and compiles
     explicit compiler();
     virtual ~compiler();
