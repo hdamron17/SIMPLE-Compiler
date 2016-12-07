@@ -1,7 +1,6 @@
 TODO
 ====
 
-* let command with only one argument (in lots)
 * track declared variables (by let or input) and ensure that none are undeclared
     * (in 07, 12, 16)
 * (in error12) unhandled out_of_range exceptiond dumps

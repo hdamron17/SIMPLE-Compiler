@@ -500,10 +500,12 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
     if(cmd->size() >= 5 && cmd->at(3) == "=") {
         string final_var = "";
         if(ALPHA.find(cmd->at(2)) != string::npos) {
-            final_var = cmd->at(2);
-        } else {
-            cerr << "Invalid variable on line " << cmd->at(0)<<endl;
-			exit(EXIT_FAILURE);
+            final_var = cmd->at(2); //final variable to hold value
+        }
+        else
+        {
+            cerr << "Invalid variable on line " << cmd->at(0) << endl;
+            exit(EXIT_FAILURE);
         }
         
         vector<string> infix(cmd->begin()+4, cmd->end()); //with only math part
@@ -519,18 +521,17 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         if(cmd->size() == 5) //only one value (i.e. "10 let x = 9" )
         {
             stringstream sml;
-            string final_var = cmd->at(2); //final variable to hold value
             string token = cmd->at(4); //value to be stored in final var
             if(ALPHA.find(token) != string::npos) { //valid variable
                 sml << "20" << token << endl; //load variable into acc for moving
                 vars.insert(token); //add variable to vars list
             }
             else // now it may be a literal but we'll see about that
-            { 
+            {
                 int num = 0;
                 try 
                 {
-                    num = manual_stoi(token); 
+                    num = manual_stoi(token);
                 } 
                 catch(invalid_argument& e) 
                 {
@@ -546,6 +547,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                 constants.insert(num); //add constant to constants list
             }
             sml << "21" << final_var << endl;
+            return make_tuple(sml.str(), 2);
         }
         else if(cmd->size() == 6)
         {
