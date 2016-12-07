@@ -12,6 +12,7 @@
 #include <sstream>
 #include <iostream>
 #include <limits.h>
+#include <cstdlib>
 #include "compiler.h"
 
 using namespace std;
@@ -119,11 +120,21 @@ vector<vector<string>> compiler::parse(istream *input)
       	//Get the line
         getline((*input),in);
         
-        //fix annoying line encoding issue
-        if(in[in.size()-1] == '\r')
-        {
-            in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
-        }
+        #if __linux__ || __APPLE__
+            //fix annoying line encoding issue
+            if(in[in.size()-1] == '\r')
+            {
+                in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
+            }
+        #elif _WIN32
+            //fix on windoze
+            if(in.size() >= 2 && in[in.size()-2] == '\r' && in[in.size()-1] == '\n')
+            {
+                in.erase(in.size()-1, 1); //remove last character if \r because we ain't no Windoze users
+            }
+        #else
+            #error Platform not supported
+        #endif
         
       	//split and save to a vector
         vector<string> line = tokenize(in," ");

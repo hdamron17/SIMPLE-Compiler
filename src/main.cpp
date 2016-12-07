@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cstdlib>
 #include "compiler.h"
 
 using namespace std;
