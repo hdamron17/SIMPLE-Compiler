@@ -509,7 +509,7 @@ string compiler::_goto(vector<string> *cmd)
  */
 bool compiler::precheck(vector<string> infix)
 {	
-	string ops = "+-/*";
+	string ops = "+-/*"; /**/
 	string paren="()";
 	
 	if(infix.size()==1 and ops.find(infix.at(0))==string::npos and paren.find(infix.at(0))==string::npos)
@@ -619,6 +619,7 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         stack<string> ids;
         int let_size = 0;
         int local_stack = 0;
+
         if(cmd->size() == 5) //only one value (i.e. "10 let x = 9" )
         {
             stringstream sml;
@@ -665,9 +666,13 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
                     string id1 = ids.top();
                     ids.pop();
                     if(id1[0] == 'S') //if it starts with S, it's popped off stack
+                    {
                         local_stack--;
+                    }
                     if(id2[0] == 'S') //if it starts with S, it's popped off stack
+                    {
                         local_stack--;
+                    }
                     int operation = 30 + operators.find(token);
                     //uses position plus 30 to convert to SML opcode
                     sml << "20" << id1 << endl //loads id1 into accumulator
