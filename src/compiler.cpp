@@ -130,7 +130,7 @@ vector<vector<string>> compiler::parse(istream *input)
         #elif _WIN32
             if(in.size() >= 2 && in[in.size()-2] != '\r' && in[in.size()-1] == '\n')
             {
-                in.insert(in.size()-1, 1, "\r"); //insert \r before ending \n
+                in.insert(in.size()-1, "\r"); //insert \r before ending \n
             }
         #else
             #error Platform not supported
