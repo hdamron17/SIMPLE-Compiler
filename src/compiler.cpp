@@ -998,6 +998,10 @@ int compiler::manual_stoi(string str)
  * @return Returns string representation
  */
 string compiler::manual_to_string(int num) {
+    if(num == 0)
+    {
+        return "0";
+    }
     stringstream out;
     if(num < 0) 
     {
