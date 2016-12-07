@@ -13,6 +13,7 @@
 #include <iostream>
 #include <limits.h>
 #include <cstdlib>
+#include <string>
 #include "compiler.h"
 
 using namespace std;
