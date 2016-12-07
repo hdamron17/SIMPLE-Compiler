@@ -88,7 +88,6 @@ string compiler::get_sml(istream *in)
 {
     vector<vector<string>> input = parse(in);
     string pseudoSML = make_sml(&input);
-    cout << pseudoSML << endl; //TODO remove
     string realSML = second_parse(pseudoSML);
     return realSML;
 }
