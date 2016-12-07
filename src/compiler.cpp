@@ -503,6 +503,89 @@ string compiler::_goto(vector<string> *cmd)
     }
 }
 
+/**
+ * Checks if infix math is valid
+ * @param infix Tokenized vector of infix math
+ * @return Returns true if everything works, else false
+ */
+bool compiler::precheck(vector<string> infix)
+{	
+	string ops = "+-/*";
+	string paren="()";
+	
+	if(infix.size()==1 and ops.find(infix.at(0))==string::npos and paren.find(infix.at(0))==string::npos)
+	{
+		return true;
+	}
+	
+	for(int i = 0; i < infix.size()-1;i++)
+	{
+		if(ops.find(infix.at(i))!=string::npos and ops.find(infix.at(i+1))!=string::npos)
+		{
+			cerr << "Double operator in infix" ;
+			return false;
+		}
+		
+		if(infix.at(i)=="(" and ops.find(infix.at(i+1))!=string::npos)
+		{
+			cerr << "Open parenthesis followed by operator";
+			return false;
+		}
+		if(ops.find(infix.at(i))!=string::npos and infix.at(i+1)==")")
+		{
+			cerr << "Operator followed by close parenthesis";
+			return false;
+		}
+		if(infix.at(i)=="(" and infix.at(i+1)==")")
+		{
+			cerr << "Nonsensical open and close parentheses. Y U DO DIS.";
+			return false;
+		}
+		if(infix.at(i)==")" and infix.at(i+1)=="(")
+		{
+			cerr << "Close and open parentheses with no meat in between. Where's the beef?!";
+			return false;
+		}
+		if(not (ops.find(infix.at(i))!=string::npos or paren.find(infix.at(i))!=string::npos) and not (ops.find(infix.at(i+1))!=string::npos or paren.find(infix.at(i+1))!=string::npos))
+		{
+			cerr << "Two ids/constants next to each other." ;
+			return false;
+		}
+		if(infix.at(i)=="(")
+		{
+			if(i!=0)
+			{
+				if(ops.find(infix.at(i-1))==string::npos and infix.at(i-1)!="(")
+				{
+					cerr<<"Open parenthesis prepended by non operator/non parenthesis" ;
+					return false;
+				}
+			}
+		}
+		if(infix.at(i)==")")
+		{
+			if(ops.find(infix.at(i+1))!=string::npos and infix.at(i+1)!=")")
+			{
+				cerr<<"Open parenthesis prepended by non operator/non parenthesis" ;
+				return false;
+			}
+		}
+	}
+	
+	int parens=0;
+	for(auto i : infix)
+	{
+		if(i=="(") parens++;
+		else if(i==")") parens--;
+	}
+	
+	if(parens!=0) 
+	{
+		cerr << "Invalid parenthetication";
+		return false;
+	}
+	return true;
+}
 
 /**
  * Creates the SML for the let command
@@ -525,6 +608,11 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
         }
         
         vector<string> infix(cmd->begin()+4, cmd->end()); //with only math part
+        bool good_code = precheck(infix); //check validity
+        if(!good_code)
+        {
+            cerr << " on line " << cmd->at(0) << endl;
+        }
         vector<string> postfix = to_postfix(infix); //math part to postfix
         
         stringstream sml;
@@ -903,4 +991,31 @@ int compiler::manual_stoi(string str)
     if(negative)
         value = -value;
     return value;
+}
+
+/**
+ * Manual to_string(int) method
+ * @param num Number to be converted
+ * @return Returns string representation
+ */
+string compiler::manual_to_string(int num) {
+    stringstream out;
+    if(num < 0) {
+        out << "-";
+        num = -num;
+    }
+    int power = 1;
+    cout<<num<<"->"<<power<<endl;
+    while(power < num) {
+        power *= 10;
+        cout<<num<<"->"<<power<<endl;
+    }
+    while(power > 0) {
+        cout << "power = " << power << endl;
+        cout << "|" << (num % power) / (power / 10) << endl;
+        out << "|" << (num % power) / (power / 10);
+        cout<<"the stuff=" <<power/10<<endl;
+        power /= 10;
+    }
+    return out.str();
 }

@@ -23,8 +23,10 @@ public:
     static std::string replace_all(std::string, std::string, std::string); //search and replace all in string
     static std::string fmt(std::string, int size, char fill); //formats string with leading characters
     static int manual_stoi(std::string); //does stoi, but in a predictable manner
+    static std::string manual_to_string(int num); //manual to_string
     static void compile(std::string, std::string); //compiles from one file into another
-private: 
+    static bool precheck(std::vector<std::string>); //prechecks postfix conversion
+//private: 
     static std::string compile(std::istream*); //converter method makes a compiler instance and compiles
     explicit compiler();
     virtual ~compiler();

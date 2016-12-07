@@ -7,6 +7,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+//    cout << compiler::manual_to_string(3424) << endl; //TODO
     if(argc == 2)
     {
     	compiler::compile(argv[1], "out.sml");
