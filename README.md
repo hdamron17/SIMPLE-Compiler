@@ -5,7 +5,7 @@ SIMPLE-Compiler
 # Compile
 Compile using predefined Makefile for Linux or with the following
 ```
-g++ --std=c++11 -o <destination> src/main.cpp src/compiler.cpp
+g++ --std=c++11 -o simplec src/main.cpp src/compiler.cpp
 ```
 
 For Windoze users, compile using preferred C++ compiler
@@ -14,7 +14,7 @@ For Windoze users, compile using preferred C++ compiler
 
 Execute a file "input.sb" by typing the following
 ```
-./<executable> input.sb
+.simplec input.sb
 ```
 
 =========
