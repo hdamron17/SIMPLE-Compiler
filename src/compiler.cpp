@@ -1,5 +1,5 @@
 /* 
- * //TODO compiler.cpp overview
+ * Compiler class parses SIMPLE code and outputs SML code
  * File:   src/compiler.cpp
  * Author: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
@@ -18,6 +18,7 @@
 
 using namespace std;
 
+//For testing if valid variable name
 static const string ALPHA = "abcdefghijklmnopqrstuvwxyz";
 
 /**
@@ -202,13 +203,7 @@ string compiler::make_sml(vector<vector<string>> *simple_code)
             string command = line[1];
             if(command == "rem") // rem
             {
-                //rem ; may be extended on future versions of interpreter
-//                sml_stream << "; ";
-//                for(int i =2; i<line.size(); i++)
-//                {
-//                    sml_stream << line[i] << " ";
-//                }
-//              	sml_stream << endl;
+                //TODO nothing
             } 
             else if(command == "input") //input
             {
@@ -337,11 +332,11 @@ string compiler::output(vector<string> *cmd)
 }
 
 /**
- * Writes SML for outpt command, putting filler for variable address
+ * Writes SML for output command, putting filler for variable address
  *
  * @param cmd Tokenized SIMPLE output command (<linenum> output <var>)
  *
- * @return Returs full SML string (always a single line for output command)
+ * @return Returns full SML string (always a single line for output command)
  */
 string compiler::_if(vector<string> *cmd) 
 {
@@ -464,7 +459,7 @@ string compiler::_if(vector<string> *cmd)
 /**
  * Writes the SML for a goto statement
  *
- * @param cmd the pointer ot the line of a comand
+ * @param cmd the pointer to the line of a comand
  *
  * @return sml as a string
  */
@@ -504,12 +499,14 @@ string compiler::_goto(vector<string> *cmd)
 
 /**
  * Checks if infix math is valid
+ * 
  * @param infix Tokenized vector of infix math
+ * 
  * @return Returns true if everything works, else false
  */
 bool compiler::precheck(vector<string> infix)
 {	
-	string ops = "+-/*"; /**/
+	string ops = "+-/*";
 	string paren="()";
 	
 	if(infix.size()==1 and ops.find(infix.at(0))==string::npos and paren.find(infix.at(0))==string::npos)
@@ -723,7 +720,9 @@ tuple<string,int> compiler::let(vector<string> *cmd) {
 /**
  * Replaces temporary variable names with physical addresses for final SML code
  *      -Also checks that SML code fits within 100 op limit
+ * 
  * @param partial_sml SML code containing variable names
+ * 
  * @return Returns complete SML code with all variable names replaced
  */
 string compiler::second_parse(string partial_sml) {
@@ -822,9 +821,12 @@ string compiler::fmt(string original, int size, char fill) {
       
 /**
  * Gives which op is of higher precedence
+ * 
  * @param op1 first operation
  * @param op2 second operation
+ * 
  * @return int 1: first is higher, 0: both are equal, -1: second is higher
+ * 
  * @author Brennan Cain
 */
 int compiler::precedence(string op1, string op2)
@@ -863,7 +865,9 @@ int compiler::precedence(string op1, string op2)
 /**
  * Converts a vector of infix to a queue of postfix
  * @param infix vector<string> golds the infix string broken on spaces
+ * 
  * @return queue<string> postfixed statement
+ * 
  * @author Brennan Cain
 */
 vector<string> compiler::to_postfix(vector<string> infix) 
@@ -928,10 +932,14 @@ vector<string> compiler::to_postfix(vector<string> infix)
 
 /**
  * Tokenizes one string into a vector of strings
+ * 
  * @param str String to be tokenized
  * @param delimiter String describing location of split between tokens
+ * 
  * @return Returns vector containing string tokens
+ * 
  * @author Hunter Damron
+ * 
  * @editor Brennan Cain ADDED THE NEWLINE BRACES
  */
 vector<string> compiler::tokenize(string str, string delimiter) 
@@ -953,9 +961,12 @@ vector<string> compiler::tokenize(string str, string delimiter)
 }
 
 /**
- * Does stoi but manually
+ * Does stoi but manually (predictable unlike the real deal)
+ * 
  * @param str String to be parsed to int
+ * 
  * @return Returns string as an int
+ * 
  * @throws Throws out_of_range if number is too big or small
  * @throws Throws invalid_argument if str does not have valid number
  */
@@ -997,7 +1008,9 @@ int compiler::manual_stoi(string str)
 
 /**
  * Manual manual_to_string(int) method
+ * 
  * @param num Number to be converted
+ * 
  * @return Returns string representation
  */
 string compiler::manual_to_string(int num) {

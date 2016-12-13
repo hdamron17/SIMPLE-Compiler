@@ -1,5 +1,5 @@
 /* 
- * //TODO compiler.h overview
+ * Header for compiler.cpp class which compiles SIMPLE to SML
  * File:   src/compiler.h
  * Author: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
