@@ -16,3 +16,6 @@ Execute a file "input.sb" by typing the following
 ```
 ./<executable> input.sb
 ```
+
+=========
+See User manual for more
