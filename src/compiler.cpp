@@ -1,7 +1,7 @@
 /* 
  * Compiler class parses SIMPLE code and outputs SML code
  * File:   src/compiler.cpp
- * Author: Hunter Damron and Brennan Cain
+ * Authors: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
  * Created on October 24, 2016, 10:08 AM
  */

@@ -1,7 +1,7 @@
 /* 
  * Header for compiler.cpp class which compiles SIMPLE to SML
  * File:   src/compiler.h
- * Author: Hunter Damron and Brennan Cain
+ * Authors: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
  *
  * Created on October 24, 2016, 10:08 AM

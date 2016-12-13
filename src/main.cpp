@@ -1,7 +1,7 @@
 /* 
  * Main class calls compiler.cpp to compile SIMPLE to SML
  * File:   src/main.cpp
- * Author: Hunter Damron and Brennan Cain
+ * Authors: Hunter Damron and Brennan Cain
  *          (hdamron17)       (brenn10)
  */
 
