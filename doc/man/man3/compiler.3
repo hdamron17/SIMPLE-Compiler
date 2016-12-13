@@ -1,0 +1,395 @@
+.TH "compiler" 3 "Mon Dec 12 2016" "Version 1.0" "SIMPLE Compiler" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+compiler \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static std::vector< std::string > \fBtokenize\fP (std::string, std::string)"
+.br
+.ti -1c
+.RI "static std::string \fBreplace_all\fP (std::string, std::string, std::string)"
+.br
+.ti -1c
+.RI "static std::string \fBfmt\fP (std::string, int size, char fill)"
+.br
+.ti -1c
+.RI "static int \fBmanual_stoi\fP (std::string)"
+.br
+.ti -1c
+.RI "static std::string \fBmanual_to_string\fP (int num)"
+.br
+.ti -1c
+.RI "static void \fBcompile\fP (std::string, std::string)"
+.br
+.ti -1c
+.RI "static bool \fBprecheck\fP (std::vector< std::string >)"
+.br
+.in -1c
+.SS "Private Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBcompiler\fP ()"
+.br
+.ti -1c
+.RI "virtual \fB~compiler\fP ()"
+.br
+.ti -1c
+.RI "std::string \fBget_sml\fP (std::istream *)"
+.br
+.ti -1c
+.RI "std::vector< std::vector< std::string > > \fBparse\fP (std::istream *)"
+.br
+.ti -1c
+.RI "std::string \fBmake_sml\fP (std::vector< std::vector< std::string >> *)"
+.br
+.ti -1c
+.RI "std::string \fBinput\fP (std::vector< std::string > *)"
+.br
+.ti -1c
+.RI "std::string \fBoutput\fP (std::vector< std::string > *)"
+.br
+.ti -1c
+.RI "std::tuple< std::string, int > \fBlet\fP (std::vector< std::string > *)"
+.br
+.ti -1c
+.RI "std::string \fB_goto\fP (std::vector< std::string > *)"
+.br
+.ti -1c
+.RI "std::string \fB_if\fP (std::vector< std::string > *)"
+.br
+.ti -1c
+.RI "std::string \fBsecond_parse\fP (std::string)"
+.br
+.ti -1c
+.RI "int \fBprecedence\fP (std::string, std::string)"
+.br
+.ti -1c
+.RI "std::vector< std::string > \fBto_postfix\fP (std::vector< std::string >)"
+.br
+.in -1c
+.SS "Static Private Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static std::string \fBcompile\fP (std::istream *)"
+.br
+.in -1c
+.SS "Private Attributes"
+
+.in +1c
+.ti -1c
+.RI "std::vector< std::vector< std::string > > \fBsimple\fP"
+.br
+.ti -1c
+.RI "std::unordered_set< int > \fBaddresses\fP"
+.br
+.ti -1c
+.RI "std::unordered_set< std::string > \fBvars\fP"
+.br
+.ti -1c
+.RI "std::unordered_set< std::string > \fBinitialized_vars\fP"
+.br
+.ti -1c
+.RI "std::unordered_set< int > \fBconstants\fP"
+.br
+.ti -1c
+.RI "std::unordered_map< int, int > \fBaddress_map\fP"
+.br
+.ti -1c
+.RI "int \fBstack_size\fP = 0"
+.br
+.ti -1c
+.RI "int \fBprogram_size\fP = 0"
+.br
+.in -1c
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "compiler::compiler ()\fC [explicit]\fP, \fC [private]\fP"
+Prevents external instantiation 
+.SS "compiler::~compiler ()\fC [private]\fP, \fC [virtual]\fP"
+Default destructor 
+.SH "Member Function Documentation"
+.PP 
+.SS "string compiler::_goto (std::vector< std::string > *)\fC [private]\fP"
+Writes the SML for a goto statement
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcmd\fP the pointer to the line of a comand
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+sml as a string 
+.RE
+.PP
+
+.SS "string compiler::_if (std::vector< std::string > *)\fC [private]\fP"
+Writes SML for output command, putting filler for variable address
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcmd\fP Tokenized SIMPLE output command (<linenum> output \fI)\fP
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+\fI Returns full SML string (always a single line for output command) \fP
+.RE
+.PP
+
+.SS "string compiler::fmt (std::string, int size, char fill)\fC [static]\fP"
+Formats the string to output with leading zeroes
+.PP
+\fBParameters:\fP
+.RS 4
+\fIoriginal\fP original string 
+.br
+\fIsize\fP how large the string should be at the end 
+.br
+\fIfill\fP char to fill empty with
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+string of string with leading zeroes 
+.RE
+.PP
+
+.SS "string compiler::get_sml (std::istream *)\fC [private]\fP"
+Takes an input stream and calls both parses on it converting to SML
+.PP
+\fBParameters:\fP
+.RS 4
+\fI*in\fP Input Stream
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+SML code as a string 
+.RE
+.PP
+
+.SS "string compiler::input (std::vector< std::string > *)\fC [private]\fP"
+Writes SML for input command, putting filler for variable address
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcmd\fP Tokenized SIMPLE input command (<linenum> input \fI)\fP
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+\fI Returs full SML string (always a single line for input command) \fP
+.RE
+.PP
+
+.SS "tuple< string, int > compiler::let (std::vector< std::string > *)\fC [private]\fP"
+Creates the SML for the let command
+.PP
+\fBParameters:\fP
+.RS 4
+\fI*cmd\fP pointer to the line with the let command
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+tuple(sml code, size of command) 
+.RE
+.PP
+
+.SS "string compiler::make_sml (std::vector< std::vector< std::string >> *)\fC [private]\fP"
+Generates 2D SML code vector from 2D SIMPLE code vector
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsimple_code\fP 2D vector containing SIMPLE code (produced by \fBparse()\fP)
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns string containing SML code in same format as simple_code 
+.RE
+.PP
+
+.SS "int compiler::manual_stoi (std::string)\fC [static]\fP"
+Does stoi but manually (predictable unlike the real deal)
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP String to be parsed to int
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns string as an int
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIThrows\fP out_of_range if number is too big or small 
+.br
+\fIThrows\fP invalid_argument if str does not have valid number 
+.RE
+.PP
+
+.SS "string compiler::manual_to_string (int num)\fC [static]\fP"
+Manual \fBmanual_to_string(int)\fP method
+.PP
+\fBParameters:\fP
+.RS 4
+\fInum\fP Number to be converted
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns string representation 
+.RE
+.PP
+
+.SS "string compiler::output (std::vector< std::string > *)\fC [private]\fP"
+Writes SML for outpt command, putting filler for variable address
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcmd\fP Tokenized SIMPLE output command (<linenum> output \fI)\fP
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+\fI Returs full SML string (always a single line for output command) \fP
+.RE
+.PP
+
+.SS "vector< vector< string > > compiler::parse (std::istream *)\fC [private]\fP"
+Parses data from istream into 2D vector for processing
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinput\fP Input istream with SIMPLE code
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 2D vector with each statement on a row and each word a term 
+.RE
+.PP
+
+.SS "int compiler::precedence (std::string, std::string)\fC [private]\fP"
+Gives which op is of higher precedence
+.PP
+\fBParameters:\fP
+.RS 4
+\fIop1\fP first operation 
+.br
+\fIop2\fP second operation
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+int 1: first is higher, 0: both are equal, -1: second is higher
+.RE
+.PP
+\fBAuthor:\fP
+.RS 4
+Brennan Cain 
+.RE
+.PP
+
+.SS "bool compiler::precheck (std::vector< std::string >)\fC [static]\fP"
+Checks if infix math is valid
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinfix\fP Tokenized vector of infix math
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns true if everything works, else false 
+.RE
+.PP
+
+.SS "string compiler::replace_all (std::string, std::string, std::string)\fC [static]\fP"
+Replaces all instances of the old string to the new string in str
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP String in which replacements will be made 
+.br
+\fIoldstr\fP String to be replaced 
+.br
+\fInewstr\fP String to be put in place of oldstr
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns str but with replacements made 
+.RE
+.PP
+
+.SS "string compiler::second_parse (std::string)\fC [private]\fP"
+Replaces temporary variable names with physical addresses for final SML code -Also checks that SML code fits within 100 op limit
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpartial_sml\fP SML code containing variable names
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns complete SML code with all variable names replaced 
+.RE
+.PP
+
+.SS "vector< string > compiler::to_postfix (std::vector< std::string >)\fC [private]\fP"
+Converts a vector of infix to a queue of postfix 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinfix\fP vector<string> golds the infix string broken on spaces
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+queue<string> postfixed statement
+.RE
+.PP
+\fBAuthor:\fP
+.RS 4
+Brennan Cain 
+.RE
+.PP
+
+.SS "vector< string > compiler::tokenize (std::string, std::string)\fC [static]\fP"
+Tokenizes one string into a vector of strings
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP String to be tokenized 
+.br
+\fIdelimiter\fP String describing location of split between tokens
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns vector containing string tokens
+.RE
+.PP
+\fBAuthor:\fP
+.RS 4
+Hunter Damron
+.RE
+.PP
+Brennan Cain ADDED THE NEWLINE BRACES 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for SIMPLE Compiler from the source code\&.
