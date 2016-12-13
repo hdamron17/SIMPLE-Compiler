@@ -20,9 +20,9 @@ or
 ```
 ./simplec <input file> <output file>
 ```
+SML code can be interpreted using the [SML Interpreter](https://github.com/hdamron17/SML-Interpreter) on Github
 
 =========
 See User manual for more
 
 Project hosted on [Github](https://github.com/hdamron17/SIMPLE-Compiler)
-fffffffffffffffffffffffffffff
