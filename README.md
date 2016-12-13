@@ -12,12 +12,17 @@ For Windoze users, compile using preferred C++ compiler
 
 # Execute
 
-Execute a file "input.sb" by typing the following
+Compile a file "input.sb" by typing the following
 ```
-.simplec input.sb
+.simplec <input file>
+```
+or
+```
+./simplec <input file> <output file>
 ```
 
 =========
 See User manual for more
 
 Project hosted on [Github](https://github.com/hdamron17/SIMPLE-Compiler)
+fffffffffffffffffffffffffffff
