@@ -14,7 +14,7 @@ For Windoze users, compile using preferred C++ compiler
 
 Compile a file "input.sb" by typing the following
 ```
-.simplec <input file>
+./simplec <input file>
 ```
 or
 ```
